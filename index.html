@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Anonymous Submission 2724 | Visual Supplement</title>
+    <meta
+      name="description"
+      content="Anonymous visual supplement for submission 2724 with videos, GLB viewers, and side-by-side comparison sliders."
+    >
+    <link rel="stylesheet" href="styles.css?v=20260902-2">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
+    <script src="script.js?v=20260902-4" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top">Anonymous Submission 2724</a>
+      <nav class="nav" aria-label="Page sections">
+        <a href="#comparisons">Comparisons</a>
+        <a href="#models">3D Models</a>
+        <a href="#videos">Videos</a>
+        <a href="#details">Details</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero section">
+        <p class="eyebrow">Anonymous Visual Supplement</p>
+        <h1>MeshRepair</h1>
+        <p class="lead">
+          Qualitative results for mesh repair under missing regions, scan noise,
+          and local surface defects. This page is prepared for anonymous review.
+        </p>
+      </section>
+
+      <section id="comparisons" class="section">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Qualitative Comparisons</p>
+            <h2>Before / After Results</h2>
+          </div>
+          <p>Drag each divider to inspect the repaired output.</p>
+        </div>
+
+        <div class="comparison-grid">
+          <article class="comparison-card">
+            <div class="comparison case-a" data-compare style="--position: 50%;">
+              <div class="compare-layer compare-after"></div>
+              <div class="compare-layer compare-before"></div>
+              <div class="compare-label before-label">Input</div>
+              <div class="compare-label after-label">Ours</div>
+              <div class="compare-handle" aria-hidden="true"></div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value="50"
+                aria-label="Reveal repaired mesh for case one"
+              >
+            </div>
+            <div class="card-copy">
+              <h3>Case 01</h3>
+              <p>Missing boundary structure</p>
+            </div>
+          </article>
+
+          <article class="comparison-card">
+            <div class="comparison case-b" data-compare style="--position: 50%;">
+              <div class="compare-layer compare-after"></div>
+              <div class="compare-layer compare-before"></div>
+              <div class="compare-label before-label">Input</div>
+              <div class="compare-label after-label">Ours</div>
+              <div class="compare-handle" aria-hidden="true"></div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value="50"
+                aria-label="Reveal repaired mesh for case two"
+              >
+            </div>
+            <div class="card-copy">
+              <h3>Case 02</h3>
+              <p>Partial scan completion</p>
+            </div>
+          </article>
+
+          <article class="comparison-card">
+            <div class="comparison case-c" data-compare style="--position: 50%;">
+              <div class="compare-layer compare-after"></div>
+              <div class="compare-layer compare-before"></div>
+              <div class="compare-label before-label">Input</div>
+              <div class="compare-label after-label">Ours</div>
+              <div class="compare-handle" aria-hidden="true"></div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value="50"
+                aria-label="Reveal repaired mesh for case three"
+              >
+            </div>
+            <div class="card-copy">
+              <h3>Case 03</h3>
+              <p>Local surface artifact removal</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="models" class="section">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Interactive GLB Results</p>
+            <h2>Motion Model Viewers</h2>
+          </div>
+          <p>Original and repaired mesh animations share the same camera view.</p>
+        </div>
+
+        <div class="model-grid">
+          <article class="model-card">
+            <div
+              class="model-viewer"
+              data-viewer
+              data-before-model="assets/models/001849_135_input.glb"
+              data-after-model="assets/models/001849_135.glb"
+              style="--position: 50%;"
+            >
+              <canvas aria-label="Interactive placeholder model for motion case one"></canvas>
+              <div class="compare-label before-label">Original</div>
+              <div class="compare-label after-label">Repaired</div>
+              <div
+                class="compare-handle model-compare-handle"
+                role="slider"
+                tabindex="0"
+                aria-label="Original and repaired mesh split for motion case one"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="50"
+              ></div>
+            </div>
+            <div class="card-copy">
+              <h3>Motion 01</h3>
+              <p>Animated repair sequence</p>
+            </div>
+          </article>
+
+          <article class="model-card">
+            <div
+              class="model-viewer"
+              data-viewer
+              data-before-model=""
+              data-after-model=""
+              style="--position: 50%;"
+            >
+              <canvas aria-label="Interactive placeholder model for motion case two"></canvas>
+              <div class="compare-label before-label">Original</div>
+              <div class="compare-label after-label">Repaired</div>
+              <div
+                class="compare-handle model-compare-handle"
+                role="slider"
+                tabindex="0"
+                aria-label="Original and repaired mesh split for motion case two"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="50"
+              ></div>
+            </div>
+            <div class="card-copy">
+              <h3>Motion 02</h3>
+              <p>Partial observation sequence</p>
+            </div>
+          </article>
+
+          <article class="model-card">
+            <div
+              class="model-viewer"
+              data-viewer
+              data-before-model=""
+              data-after-model=""
+              style="--position: 50%;"
+            >
+              <canvas aria-label="Interactive placeholder model for motion case three"></canvas>
+              <div class="compare-label before-label">Original</div>
+              <div class="compare-label after-label">Repaired</div>
+              <div
+                class="compare-handle model-compare-handle"
+                role="slider"
+                tabindex="0"
+                aria-label="Original and repaired mesh split for motion case three"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="50"
+              ></div>
+            </div>
+            <div class="card-copy">
+              <h3>Motion 03</h3>
+              <p>Surface refinement sequence</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="videos" class="section">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Video Results</p>
+            <h2>Rendered Mesh Sequences</h2>
+          </div>
+          <p>Short MP4 clips for rotation, failure cases, or extra examples.</p>
+        </div>
+
+        <div class="video-grid">
+          <article class="video-card">
+            <div class="video-shell">
+              <video controls muted loop playsinline preload="metadata">
+                <source src="assets/videos/example-01.mp4" type="video/mp4">
+              </video>
+              <div class="video-fallback">Video 01</div>
+            </div>
+            <h3>Thin Structure Repair</h3>
+          </article>
+
+          <article class="video-card">
+            <div class="video-shell">
+              <video controls muted loop playsinline preload="metadata">
+                <source src="assets/videos/example-02.mp4" type="video/mp4">
+              </video>
+              <div class="video-fallback">Video 02</div>
+            </div>
+            <h3>Scan Completion</h3>
+          </article>
+
+          <article class="video-card">
+            <div class="video-shell">
+              <video controls muted loop playsinline preload="metadata">
+                <source src="assets/videos/example-03.mp4" type="video/mp4">
+              </video>
+              <div class="video-fallback">Video 03</div>
+            </div>
+            <h3>Surface Refinement</h3>
+          </article>
+        </div>
+      </section>
+
+      <section id="details" class="section details-section">
+        <p class="section-kicker">Submission Notes</p>
+        <p>
+          Keep this page anonymous: use neutral filenames, remove author and
+          institution names from assets, and avoid external links that identify
+          the authors before the review period ends.
+        </p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Anonymous visual supplement</span>
+      <a href="#top">Back to top</a>
+    </footer>
+  </body>
+</html>
