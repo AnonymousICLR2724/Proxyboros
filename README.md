@@ -37,18 +37,29 @@ Then open `http://127.0.0.1:8000/`.
 
 Use a local static server or GitHub Pages to preview real GLB loading; browsers
 often block local model fetches when opening `index.html` directly.
-- For comparison sliders, set per-card background images directly:
+- For the five-column Qualitative Comparisons carousel, edit `comparisonCases`
+  at the top of `script.js`. The `"smpl-h"` and `"non-smpl"` lists contain
+  separate cases, selected by the two buttons. Each entry has these GLB paths:
 
-```html
-<div
-  class="comparison"
-  data-compare
-  style="
-    --position: 50%;
-    --before-bg: url('assets/examples/case-01-before.png') center / cover no-repeat;
-    --after-bg: url('assets/examples/case-01-after.png') center / cover no-repeat;
-  "
->
+```javascript
+{
+  title: "Description of the motion",
+  input: "assets/models/case-01-input.glb",
+  isir: "assets/models/case-01-isir.glb",
+  meshUtg: "assets/models/case-01-mesh-utg.glb",
+  poseShield: "assets/models/case-01-pose-shield.glb",
+  ours: "assets/models/case-01-ours.glb",
+}
 ```
+
+Empty paths display "GLB to be added". Only the first SMPL-H case currently has
+Input and Ours assets; the remaining cases are placeholders. PoseShield always
+displays "Unavailable" for non-SMPL, and its path is ignored in that group.
+Switching groups returns to the first case in the selected group.
+Arrows wrap through the cases; the progress slider selects a case directly.
+All five views change together, share a camera and animation clock, and use the
+same bounds. Export each method in matching coordinates, units, and timing.
+
+Run `node --test tests/carousel.test.cjs` to check case navigation and stale-load handling.
 
 Keep individual media files below GitHub's 100 MiB hard file limit.

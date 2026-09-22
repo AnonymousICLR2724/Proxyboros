@@ -1,22 +1,29 @@
-const comparisons = document.querySelectorAll("[data-compare]");
-
-comparisons.forEach((comparison) => {
-  const slider = comparison.querySelector('input[type="range"]');
-  if (!slider) return;
-
-  const updateSlider = () => {
-    comparison.style.setProperty("--position", `${slider.value}%`);
-    slider.setAttribute("aria-valuetext", `${slider.value}% repaired reveal`);
-  };
-
-  slider.addEventListener("input", updateSlider);
-  updateSlider();
-});
+// Add one entry per case; empty paths remain explicitly marked as unavailable.
+const comparisonCases = {
+  "smpl-h": [
+    {
+      title: "Motion sequence 001849_135",
+      input: "assets/models/001849_135_input.glb",
+      isir: "",
+      meshUtg: "",
+      poseShield: "",
+      ours: "assets/models/001849_135.glb",
+    },
+    { title: "Motion sequence · GLBs to be added", input: "", isir: "", meshUtg: "", poseShield: "", ours: "" },
+    { title: "Motion sequence · GLBs to be added", input: "", isir: "", meshUtg: "", poseShield: "", ours: "" },
+  ],
+  "non-smpl": [
+    { title: "non-SMPL motion · GLBs to be added", input: "", isir: "", meshUtg: "", ours: "" },
+    { title: "non-SMPL motion · GLBs to be added", input: "", isir: "", meshUtg: "", ours: "" },
+    { title: "non-SMPL motion · GLBs to be added", input: "", isir: "", meshUtg: "", ours: "" },
+  ],
+};
 
 const viewerRoots = document.querySelectorAll("[data-viewer]");
 const activeViewers = [];
 
-if (window.THREE && viewerRoots.length) {
+if (window.THREE) {
+  initComparisonCarousel();
   viewerRoots.forEach((viewerRoot, index) => {
     const viewer = createModelComparisonViewer(viewerRoot, index);
     if (viewer) activeViewers.push(viewer);
@@ -30,9 +37,122 @@ if (window.THREE && viewerRoots.length) {
   requestAnimationFrame(tick);
 }
 
-function createModelComparisonViewer(container, index) {
+function initComparisonCarousel() {
+  const carousel = document.querySelector(".case-carousel");
+  if (!carousel) return;
+
+  const progress = carousel.querySelector(".case-progress");
+  const caption = carousel.querySelector(".case-caption");
+  const count = carousel.querySelector(".case-count");
+  const grid = carousel.querySelector(".method-grid");
+  const scroll = carousel.querySelector(".method-scroll");
+  const groupButtons = document.querySelectorAll("[data-case-group]");
+  const clock = new THREE.Clock();
+  const loader = new THREE.GLTFLoader();
+  const columns = Array.from(carousel.querySelectorAll("[data-method]"));
+  const viewers = columns.map((column, index) => createModelComparisonViewer(column, index, clock));
+  activeViewers.push(...viewers);
+  let currentIndex = 0;
+  let currentGroup = "smpl-h";
+  let loadVersion = 0;
+  let syncingCamera = false;
+
+  viewers.forEach((source) => {
+    source.controls.addEventListener("change", () => {
+      if (syncingCamera) return;
+      syncingCamera = true;
+      viewers.forEach((target) => {
+        if (target === source) return;
+        target.camera.position.copy(source.camera.position);
+        target.camera.quaternion.copy(source.camera.quaternion);
+        target.controls.target.copy(source.controls.target);
+        target.controls.update();
+      });
+      syncingCamera = false;
+    });
+  });
+
+  async function showCase(index, direction = 1) {
+    const cases = comparisonCases[currentGroup];
+    currentIndex = (index + cases.length) % cases.length;
+    const entry = cases[currentIndex];
+    const unavailable = columns.map((column) => currentGroup === "non-smpl" && column.dataset.method === "poseShield");
+    const paths = columns.map((column, i) => unavailable[i] ? "" : entry[column.dataset.method]);
+    const version = ++loadVersion;
+    const number = String(currentIndex + 1).padStart(2, "0");
+    progress.max = cases.length - 1;
+    progress.value = currentIndex;
+    progress.setAttribute("aria-valuetext", `Case ${currentIndex + 1} of ${cases.length}`);
+    count.textContent = `${number} / ${String(cases.length).padStart(2, "0")}`;
+    caption.textContent = `Case ${number} · ${entry.title}`;
+    grid.setAttribute("aria-busy", "true");
+    columns.forEach((column, i) => {
+      viewers[i].setModel(null);
+      const status = column.querySelector(".model-status");
+      status.hidden = false;
+      status.textContent = unavailable[i] ? "Unavailable" : paths[i] ? "Loading GLB…" : "GLB to be added";
+    });
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // Animate the scroll viewport inside its clip, not the scrollable content.
+      scroll.getAnimations().forEach((animation) => animation.cancel());
+      scroll.animate(
+        [{ opacity: 0, transform: `translateX(${direction * 24}px)` }, { opacity: 1, transform: "translateX(0)" }],
+        { duration: 260, easing: "ease-out" },
+      );
+    }
+
+    const results = await Promise.all(paths.map(async (path) => {
+      if (!path) return null;
+      try {
+        return await loader.loadAsync(path);
+      } catch {
+        return null;
+      }
+    }));
+    // An earlier request must never replace the currently selected case.
+    if (version !== loadVersion) {
+      results.forEach((gltf) => { if (gltf) disposeModel(gltf.scene); });
+      return;
+    }
+
+    const bounds = new THREE.Box3();
+    results.forEach((gltf) => {
+      if (gltf) bounds.union(getSequenceBox(gltf.scene, gltf.animations));
+    });
+    results.forEach((gltf, i) => {
+      const status = columns[i].querySelector(".model-status");
+      if (gltf) {
+        normalizeModel(gltf.scene, bounds);
+        applyModelMaterial(gltf.scene, columns[i].dataset.method === "input" ? "before" : "after");
+        viewers[i].setModel(gltf);
+        status.hidden = true;
+      } else if (paths[i]) {
+        status.textContent = "Unable to load GLB";
+      }
+    });
+    clock.start();
+    grid.setAttribute("aria-busy", "false");
+  }
+
+  groupButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      if (currentGroup === button.dataset.caseGroup) return;
+      currentGroup = button.dataset.caseGroup;
+      groupButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      scroll.scrollLeft = 0;
+      showCase(0);
+    });
+  });
+  carousel.querySelector("[data-case-prev]").addEventListener("click", () => showCase(currentIndex - 1, -1));
+  carousel.querySelector("[data-case-next]").addEventListener("click", () => showCase(currentIndex + 1, 1));
+  progress.addEventListener("input", () => showCase(Number(progress.value), Number(progress.value) < currentIndex ? -1 : 1));
+  showCase(0);
+}
+
+function createModelComparisonViewer(container, index, clock = new THREE.Clock()) {
   const canvas = container.querySelector("canvas");
   const handle = container.querySelector(".model-compare-handle");
+  const singleModel = container.hasAttribute("data-method");
   if (!canvas) return null;
 
   const renderer = new THREE.WebGLRenderer({
@@ -51,7 +171,7 @@ function createModelComparisonViewer(container, index) {
   camera.position.set(0, 0, 3.7);
 
   const controls = new THREE.OrbitControls(camera, canvas);
-  controls.enableDamping = true;
+  controls.enableDamping = !singleModel;
   controls.enablePan = false;
   controls.autoRotate = false;
   controls.autoRotateSpeed = 0.55;
@@ -74,16 +194,17 @@ function createModelComparisonViewer(container, index) {
 
   const beforeRoot = new THREE.Group();
   const afterRoot = new THREE.Group();
-  const beforePlaceholder = createPlaceholderModel(index, "before");
-  const afterPlaceholder = createPlaceholderModel(index, "after");
-  normalizeModel(beforePlaceholder);
-  normalizeModel(afterPlaceholder);
-  beforeRoot.add(beforePlaceholder);
-  afterRoot.add(afterPlaceholder);
+  if (!singleModel) {
+    const beforePlaceholder = createPlaceholderModel(index, "before");
+    const afterPlaceholder = createPlaceholderModel(index, "after");
+    normalizeModel(beforePlaceholder);
+    normalizeModel(afterPlaceholder);
+    beforeRoot.add(beforePlaceholder);
+    afterRoot.add(afterPlaceholder);
+  }
   scene.add(beforeRoot, afterRoot);
 
   const mixers = [];
-  const clock = new THREE.Clock();
   const beforePath = (container.dataset.beforeModel || "").trim();
   const afterPath = (container.dataset.afterModel || "").trim();
 
@@ -176,6 +297,25 @@ function createModelComparisonViewer(container, index) {
   }
 
   return {
+    camera,
+    controls,
+    setModel(gltf) {
+      mixers.forEach((mixer) => {
+        mixer.stopAllAction();
+        mixer.uncacheRoot(mixer.getRoot());
+      });
+      mixers.length = 0;
+      disposeModel(afterRoot);
+      clearGroup(afterRoot);
+      if (!gltf) return;
+      afterRoot.add(gltf.scene);
+      if (gltf.animations.length) {
+        const mixer = new THREE.AnimationMixer(gltf.scene);
+        mixer.duration = Math.max(...gltf.animations.map((clip) => clip.duration));
+        gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
+        mixers.push(mixer);
+      }
+    },
     update() {
       const elapsed = clock.getElapsedTime();
       mixers.forEach((mixer) => {
@@ -184,9 +324,26 @@ function createModelComparisonViewer(container, index) {
       });
       controls.target.set(0, 0, 0);
       controls.update();
-      renderSplitView(renderer, scene, camera, beforeRoot, afterRoot, size, splitPosition);
+      if (singleModel) {
+        renderer.clear();
+        renderer.render(scene, camera);
+      } else {
+        renderSplitView(renderer, scene, camera, beforeRoot, afterRoot, size, splitPosition);
+      }
     },
   };
+}
+
+function disposeModel(root) {
+  root.traverse((object) => {
+    if (object.geometry) object.geometry.dispose();
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    materials.forEach((material) => {
+      if (!material) return;
+      Object.values(material).forEach((value) => { if (value && value.isTexture) value.dispose(); });
+      material.dispose();
+    });
+  });
 }
 
 function renderSplitView(renderer, scene, camera, beforeRoot, afterRoot, size, splitPosition) {
@@ -243,7 +400,7 @@ function createPlaceholderModel(index, variant) {
       ? new THREE.TorusKnotGeometry(0.58, 0.16, 80, 12)
       : new THREE.IcosahedronGeometry(0.82, 2);
   const material = new THREE.MeshStandardMaterial({
-    color: variant === "before" ? 0x6f7885 : [0x0b7f79, 0x19806f, 0xc99a2e][index % 3],
+    color: variant === "before" ? 0x6f7885 : [0x3978c9, 0x6964cf, 0x986dc5][index % 3],
     roughness: 0.48,
     metalness: 0.06,
   });

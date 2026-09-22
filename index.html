@@ -3,20 +3,24 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Anonymous Submission 2724 | Visual Supplement</title>
+    <title>Proxyboros: Motion-Faithful Dynamic Self-Intersection Repair for Rigged Mesh Animations</title>
     <meta
       name="description"
-      content="Anonymous visual supplement for submission 2724 with videos, GLB viewers, and side-by-side comparison sliders."
+      content="Proxyboros: Motion-Faithful Dynamic Self-Intersection Repair for Rigged Mesh Animations. Anonymous submission 2724 with interactive results and visual comparisons."
     >
-    <link rel="stylesheet" href="styles.css?v=20260902-2">
+    <link rel="icon" type="image/png" href="assets/logo_boros.png">
+    <link rel="stylesheet" href="styles.css?v=20260921-4">
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
-    <script src="script.js?v=20260902-4" defer></script>
+    <script src="script.js?v=20260921-4" defer></script>
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="#top">Anonymous Submission 2724</a>
+      <a class="brand" href="#top" aria-label="Proxyboros, back to top">
+        <img src="assets/logo_boros.png" alt="" width="36" height="36">
+        <span>Proxyboros</span>
+      </a>
       <nav class="nav" aria-label="Page sections">
         <a href="#comparisons">Comparisons</a>
         <a href="#models">3D Models</a>
@@ -27,11 +31,29 @@
 
     <main id="top">
       <section class="hero section">
-        <p class="eyebrow">Anonymous Visual Supplement</p>
-        <h1>MeshRepair</h1>
+        <h1>
+          <span class="title-line">Proxyboros: Motion-Faithful Dynamic</span>
+          <span class="title-line">Self-Intersection Repair for Rigged Mesh Animations</span>
+        </h1>
+        <p class="submission">Anonymous Submission 2724</p>
+        <div class="project-links" role="group" aria-label="Project materials, coming soon">
+          <!-- Replace each button with an anchor and its URL when the resource is available. -->
+          <button class="resource-button" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <path d="M14 3H6v18h12V7z M14 3v5h4 M9 12h6 M9 16h6"/>
+            </svg>
+            <span>Paper</span><span class="resource-status">coming soon</span>
+          </button>
+          <button class="resource-button" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <path d="m8 6-6 6 6 6 M16 6l6 6-6 6 M14 3l-4 18"/>
+            </svg>
+            <span>Code</span><span class="resource-status">coming soon</span>
+          </button>
+        </div>
         <p class="lead">
-          Qualitative results for mesh repair under missing regions, scan noise,
-          and local surface defects. This page is prepared for anonymous review.
+          <strong>Proxyboros</strong> repairs dynamic self-intersections in rigged mesh
+          animations while preserving the original motion.
         </p>
       </section>
 
@@ -39,74 +61,64 @@
         <div class="section-heading">
           <div>
             <p class="section-kicker">Qualitative Comparisons</p>
-            <h2>Before / After Results</h2>
+            <h2>Method Comparisons</h2>
           </div>
-          <p>Drag each divider to inspect the repaired output.</p>
+          <div class="comparison-groups" role="group" aria-label="Mesh type">
+            <button type="button" data-case-group="smpl-h" aria-pressed="true" aria-controls="comparison-panel">SMPL-H</button>
+            <button type="button" data-case-group="non-smpl" aria-pressed="false" aria-controls="comparison-panel">non-SMPL</button>
+          </div>
         </div>
 
-        <div class="comparison-grid">
-          <article class="comparison-card">
-            <div class="comparison case-a" data-compare style="--position: 50%;">
-              <div class="compare-layer compare-after"></div>
-              <div class="compare-layer compare-before"></div>
-              <div class="compare-label before-label">Input</div>
-              <div class="compare-label after-label">Ours</div>
-              <div class="compare-handle" aria-hidden="true"></div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value="50"
-                aria-label="Reveal repaired mesh for case one"
-              >
+        <div id="comparison-panel" class="case-carousel" aria-label="Five-method mesh comparison">
+          <div class="case-controls">
+            <button type="button" class="case-arrow" data-case-prev aria-label="Previous comparison case">&#8592;</button>
+            <input class="case-progress" type="range" min="0" max="2" value="0" step="1" aria-label="Comparison case">
+            <span class="case-count">01 / 03</span>
+            <button type="button" class="case-arrow" data-case-next aria-label="Next comparison case">&#8594;</button>
+          </div>
+          <p class="case-caption" aria-live="polite" aria-atomic="true">Case 01 · Motion sequence 001849_135</p>
+          <div class="method-viewport">
+            <div class="method-scroll" tabindex="0" role="region" aria-label="Comparison methods; scroll horizontally on small screens">
+              <div class="method-grid">
+                <article class="method-column">
+                  <h3>Input</h3>
+                  <div class="model-viewer" data-method="input">
+                    <canvas aria-label="Input interactive mesh"></canvas>
+                    <p class="model-status">GLB to be added</p>
+                  </div>
+                </article>
+                <article class="method-column">
+                  <h3>ISIR</h3>
+                  <div class="model-viewer" data-method="isir">
+                    <canvas aria-label="ISIR interactive mesh"></canvas>
+                    <p class="model-status">GLB to be added</p>
+                  </div>
+                </article>
+                <article class="method-column">
+                  <h3>Mesh-Utg</h3>
+                  <div class="model-viewer" data-method="meshUtg">
+                    <canvas aria-label="Mesh-Utg interactive mesh"></canvas>
+                    <p class="model-status">GLB to be added</p>
+                  </div>
+                </article>
+                <article class="method-column">
+                  <h3>PoseShield</h3>
+                  <div class="model-viewer" data-method="poseShield">
+                    <canvas aria-label="PoseShield interactive mesh"></canvas>
+                    <p class="model-status">GLB to be added</p>
+                  </div>
+                </article>
+                <article class="method-column method-ours">
+                  <h3>Ours</h3>
+                  <div class="model-viewer" data-method="ours">
+                    <canvas aria-label="Ours interactive mesh"></canvas>
+                    <p class="model-status">GLB to be added</p>
+                  </div>
+                </article>
+              </div>
             </div>
-            <div class="card-copy">
-              <h3>Case 01</h3>
-              <p>Missing boundary structure</p>
-            </div>
-          </article>
-
-          <article class="comparison-card">
-            <div class="comparison case-b" data-compare style="--position: 50%;">
-              <div class="compare-layer compare-after"></div>
-              <div class="compare-layer compare-before"></div>
-              <div class="compare-label before-label">Input</div>
-              <div class="compare-label after-label">Ours</div>
-              <div class="compare-handle" aria-hidden="true"></div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value="50"
-                aria-label="Reveal repaired mesh for case two"
-              >
-            </div>
-            <div class="card-copy">
-              <h3>Case 02</h3>
-              <p>Partial scan completion</p>
-            </div>
-          </article>
-
-          <article class="comparison-card">
-            <div class="comparison case-c" data-compare style="--position: 50%;">
-              <div class="compare-layer compare-after"></div>
-              <div class="compare-layer compare-before"></div>
-              <div class="compare-label before-label">Input</div>
-              <div class="compare-label after-label">Ours</div>
-              <div class="compare-handle" aria-hidden="true"></div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value="50"
-                aria-label="Reveal repaired mesh for case three"
-              >
-            </div>
-            <div class="card-copy">
-              <h3>Case 03</h3>
-              <p>Local surface artifact removal</p>
-            </div>
-          </article>
+          </div>
+          <p class="comparison-hint">Drag any model to rotate all views. Scroll to zoom.</p>
         </div>
       </section>
 
