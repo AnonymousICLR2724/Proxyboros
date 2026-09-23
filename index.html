@@ -9,11 +9,11 @@
       content="Proxyboros: Motion-Faithful Dynamic Self-Intersection Repair for Rigged Mesh Animations. Anonymous submission 2724 with interactive results and visual comparisons."
     >
     <link rel="icon" type="image/png" href="assets/logo_boros.png">
-    <link rel="stylesheet" href="styles.css?v=20260923-1">
+    <link rel="stylesheet" href="styles.css?v=20260923-2">
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
-    <script src="script.js?v=20260923-1" defer></script>
+    <script src="script.js?v=20260923-2" defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -24,7 +24,7 @@
       <nav class="nav" aria-label="Page sections">
         <a href="#comparisons">Comparisons</a>
         <a href="#models">3D Models</a>
-        <a href="#videos">Videos</a>
+        <!-- <a href="#videos">Videos</a> -->
         <a href="#details">Details</a>
       </nav>
     </header>
@@ -76,7 +76,14 @@
             <span class="case-count">01 / 15</span>
             <button type="button" class="case-arrow" data-case-next aria-label="Next comparison case">&#8594;</button>
           </div>
-          <p class="case-caption" aria-live="polite" aria-atomic="true">Case 01 · Motion sequence 001849_135</p>
+          <div class="case-info-row">
+            <p class="case-caption" aria-live="polite" aria-atomic="true">Motion Case 01</p>
+            <div class="comparison-mode" role="group" aria-label="Comparison display mode">
+              <span>Mode</span>
+              <button type="button" data-display-mode="normal" aria-pressed="true">Normal</button>
+              <button type="button" data-display-mode="texture" aria-pressed="false">Texture</button>
+            </div>
+          </div>
           <p class="case-status" role="status" aria-atomic="true"></p>
           <div class="method-viewport">
             <div class="method-scroll" tabindex="0" role="region" aria-label="Comparison methods; scroll horizontally on small screens">
@@ -126,96 +133,23 @@
       <section id="models" class="section">
         <div class="section-heading">
           <div>
-            <p class="section-kicker">Interactive GLB Results</p>
-            <h2>Motion Model Viewers</h2>
+            <p class="section-kicker">Interactive Animation Gallery</p>
+            <h2>Repaired Animations from Proxyboros</h2>
           </div>
-          <p>Original and repaired mesh animations share the same camera view.</p>
+          <p>Explore Original / Repaired splits. Browse one motion at a time, or let the gallery advance when idle.</p>
         </div>
 
-        <div class="model-grid">
-          <article class="model-card">
-            <div
-              class="model-viewer"
-              data-viewer
-              data-before-model="assets/models/SMPLH-comparison/motionfix_001849_135/input.glb"
-              data-after-model="assets/models/SMPLH-comparison/motionfix_001849_135/ours.glb"
-              style="--position: 50%;"
-            >
-              <canvas aria-label="Interactive placeholder model for motion case one"></canvas>
-              <div class="compare-label before-label">Original</div>
-              <div class="compare-label after-label">Repaired</div>
-              <div
-                class="compare-handle model-compare-handle"
-                role="slider"
-                tabindex="0"
-                aria-label="Original and repaired mesh split for motion case one"
-                aria-valuemin="0"
-                aria-valuemax="100"
-                aria-valuenow="50"
-              ></div>
-            </div>
-            <div class="card-copy">
-              <h3>Motion 01</h3>
-              <p>Animated repair sequence</p>
-            </div>
-          </article>
-
-          <article class="model-card">
-            <div
-              class="model-viewer"
-              data-viewer
-              data-before-model=""
-              data-after-model=""
-              style="--position: 50%;"
-            >
-              <canvas aria-label="Interactive placeholder model for motion case two"></canvas>
-              <div class="compare-label before-label">Original</div>
-              <div class="compare-label after-label">Repaired</div>
-              <div
-                class="compare-handle model-compare-handle"
-                role="slider"
-                tabindex="0"
-                aria-label="Original and repaired mesh split for motion case two"
-                aria-valuemin="0"
-                aria-valuemax="100"
-                aria-valuenow="50"
-              ></div>
-            </div>
-            <div class="card-copy">
-              <h3>Motion 02</h3>
-              <p>Partial observation sequence</p>
-            </div>
-          </article>
-
-          <article class="model-card">
-            <div
-              class="model-viewer"
-              data-viewer
-              data-before-model=""
-              data-after-model=""
-              style="--position: 50%;"
-            >
-              <canvas aria-label="Interactive placeholder model for motion case three"></canvas>
-              <div class="compare-label before-label">Original</div>
-              <div class="compare-label after-label">Repaired</div>
-              <div
-                class="compare-handle model-compare-handle"
-                role="slider"
-                tabindex="0"
-                aria-label="Original and repaired mesh split for motion case three"
-                aria-valuemin="0"
-                aria-valuemax="100"
-                aria-valuenow="50"
-              ></div>
-            </div>
-            <div class="card-copy">
-              <h3>Motion 03</h3>
-              <p>Surface refinement sequence</p>
-            </div>
-          </article>
+        <div class="film-gallery" role="region" aria-label="Animation gallery">
+          <button type="button" class="gallery-arrow" data-gallery-prev aria-label="Previous animation">&#8592;</button>
+          <div class="gallery-viewport">
+            <div class="gallery-track"></div>
+          </div>
+          <button type="button" class="gallery-arrow" data-gallery-next aria-label="Next animation">&#8594;</button>
         </div>
+        <p class="gallery-count"></p>
       </section>
 
+      <!-- Video results temporarily disabled.
       <section id="videos" class="section">
         <div class="section-heading">
           <div>
@@ -257,6 +191,7 @@
           </article>
         </div>
       </section>
+      -->
 
       <section id="details" class="section details-section">
         <p class="section-kicker">Submission Notes</p>

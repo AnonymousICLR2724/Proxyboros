@@ -25,8 +25,12 @@ test("all 15 SMPL-H cases reference five existing compressed GLBs", () => {
   const html = readFileSync(join(__dirname, "../index.html"), "utf8");
   assert.match(html, /class="case-progress"[^>]*max="14"/);
   assert.match(html, /01 \/ 15/);
-  assert.ok(html.includes(`data-before-model="${cases[0].input}"`));
-  assert.ok(html.includes(`data-after-model="${cases[0].ours}"`));
+  assert.match(html, /class="case-caption"[^>]*>Motion Case 01<\/p>/);
+  assert.match(html, /class="gallery-track"/);
+  assert.match(html, /data-display-mode="normal" aria-pressed="true"/);
+  const rendered = html.replace(/<!--[\s\S]*?-->/g, "");
+  assert.doesNotMatch(rendered, /<section id="videos"|href="#videos"|<video\b/);
+  assert.match(html, /<section id="videos"/, "video markup is preserved inside a comment");
   assert.doesNotMatch(source + html, /assets\/models\/001849_135(?:_input)?\.glb/);
 });
 
@@ -34,6 +38,7 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   const element = () => ({
     events: {},
     attributes: {},
+    getAnimations: () => [],
     addEventListener(name, handler) { this.events[name] = handler; },
     setAttribute(name, value) { this.attributes[name] = value; },
   });
@@ -44,6 +49,7 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   const groupButtons = ["smpl-h", "non-smpl"].map((group) => ({
     ...element(), dataset: { caseGroup: group },
   }));
+  const modeButtons = ["normal", "texture"].map((mode) => ({ ...element(), dataset: { displayMode: mode } }));
   const methods = ["input", "isir", "meshUtg", "poseShield", "ours"];
   const columns = methods.map((method) => ({
     dataset: { method },
@@ -53,6 +59,7 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   const frames = [];
   const viewers = columns.map(() => ({
     model: null,
+    setMode(mode) { this.mode = mode; },
     update(elapsed) { frames.push(elapsed); },
     controls: element(),
     setModel(model) { this.model = model; },
@@ -65,7 +72,7 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
       querySelectorAll: (selector) => selector === "[data-case-group]" ? groupButtons : [],
       querySelector: () => ({
         querySelector: (selector) => controls[selector],
-        querySelectorAll: () => columns,
+        querySelectorAll: (selector) => selector === "[data-display-mode]" ? modeButtons : columns,
       }),
     },
     THREE: {
@@ -88,7 +95,8 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
     return { reference: scene.id, getSize: () => ({ x: 1, y: 2, z: 1 }), expandByScalar(margin) { this.margin = margin; } };
   };
   context.normalizeModel = (scene, bounds) => normalized.push({ scene: scene.id, bounds });
-  context.applyModelMaterial = () => {};
+  const preparedModes = [];
+  context.applyModelMaterial = (_, variant, mode) => preparedModes.push(mode);
   context.disposeModel = (scene) => disposed.push(scene.id);
   const populated = (prefix) => Object.fromEntries(methods.map((method) => [method, `${prefix}-${method}`]));
   context.cases = Array.from({ length: 15 }, (_, i) => ({ title: `Motion ${i + 1}`, ...populated(`case-${i + 1}`) }));
@@ -126,27 +134,38 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   assert.equal(normalized[0].bounds.margin, 0.2, "shared margin is 10% of Input extent on each side");
   assert.ok(normalized.every((item) => item.bounds === normalized[0].bounds), "all methods receive the same bounds object");
 
+  assert.deepEqual(preparedModes, ["normal", "normal", "normal", "normal", "normal"]);
+  const beforeToggle = requests.length;
+  modeButtons[1].events.click();
+  assert.ok(viewers.every((viewer) => viewer.mode === "texture"));
+  assert.equal(requests.length, beforeToggle, "mode switches never reload GLBs");
+  assert.equal(modeButtons[1].attributes["aria-pressed"], "true");
+
   next();
-  assert.deepEqual(ids(), expected(1), "old geometry stays visible while loading");
-  assert.match(caption.textContent, /Case 01/, "old caption stays with old geometry");
-  assert.equal(count.textContent, "01 / 15");
-  assert.match(status.textContent, /Loading SMPL-H Case 02/);
+  assert.deepEqual(ids(), methods.map(() => null), "old geometry clears immediately");
+  assert.equal(caption.textContent, "Motion Case 02", "caption immediately identifies requested case");
+  assert.equal(count.textContent, "02 / 15");
+  assert.match(status.textContent, /Loading Motion Case 02/);
   requests.slice(-5, -1).forEach(resolve);
   await flush();
-  assert.deepEqual(ids(), expected(1), "partial completion does not swap any method");
+  assert.deepEqual(ids(), methods.map(() => null), "partial completion leaves every method empty");
   resolve(requests.at(-1));
   await flush();
   assert.deepEqual(ids(), expected(2));
+  assert.ok(preparedModes.slice(-5).every((mode) => mode === "texture"), "chosen mode persists across cases");
   assert.equal(count.textContent, "02 / 15");
+  assert.equal(caption.textContent, "Motion Case 02");
+  assert.doesNotMatch(caption.textContent + status.textContent, /\d{6}_135/);
   assert.deepEqual(bounded, ["case-1-input", "case-2-input"], "one Input computation for each loaded case");
   assert.equal(status.textContent, "");
 
   next();
   const stale = requests.slice(-5);
   next();
-  await settle();
   stale.forEach(resolve);
   await flush();
+  assert.deepEqual(ids(), methods.map(() => null), "stale results cannot appear while the latest batch is loading");
+  await settle();
   assert.deepEqual(ids(), expected(4), "stale loads cannot overwrite latest case");
   assert.equal(disposed.length, 5, "stale scenes are disposed");
 
@@ -172,25 +191,25 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   failed[0].reject(new Error("missing GLB"));
   failed.slice(1).forEach(resolve);
   await flush();
-  assert.deepEqual(ids(), expected(15), "failed batch retains every previous model");
-  assert.match(caption.textContent, /Case 15/);
-  assert.match(status.textContent, /Unable to load Case 01.*Previous case retained/);
+  assert.deepEqual(ids(), methods.map(() => null), "failed batch leaves the requested case empty");
+  assert.equal(caption.textContent, "Motion Case 01");
+  assert.match(status.textContent, /Unable to load Motion Case 01/);
   assert.equal(disposed.length, 9, "dispose successful members of failed batch");
-  assert.equal(Number(progress.value), 14, "restore selection after failure");
-  assert.equal(progress.attributes["aria-valuetext"], "Case 15 of 15");
+  assert.equal(Number(progress.value), 0, "keep requested selection after failure");
+  assert.equal(progress.attributes["aria-valuetext"], "Case 1 of 15");
   assert.equal(controls[".method-grid"].attributes["aria-busy"], "false");
-  next();
+  progress.events.change();
   await settle();
   assert.deepEqual(ids(), expected(1), "failed case can be retried");
 
   const beforeGroupSwitch = requests.length;
   groupButtons[1].events.click();
-  assert.deepEqual(ids(), expected(1), "group loading retains the displayed group");
-  assert.equal(groupButtons[0].attributes["aria-pressed"], "true");
+  assert.deepEqual(ids(), methods.map(() => null), "group switching immediately clears old geometry");
+  assert.equal(groupButtons[0].attributes["aria-pressed"], "false");
   assert.equal(requests.length - beforeGroupSwitch, 4, "never request non-SMPL PoseShield, even if configured");
   requests.slice(-4).forEach(resolve);
   await flush();
-  assert.match(caption.textContent, /Case 01 · Non-SMPL/);
+  assert.equal(caption.textContent, "Motion Case 01");
   assert.equal(progress.max, 1);
   assert.equal(groupButtons[1].attributes["aria-pressed"], "true");
   assert.equal(groupButtons[0].attributes["aria-pressed"], "false");
@@ -208,52 +227,20 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   await flush();
   staleGroup.forEach(resolve);
   await flush();
-  assert.match(caption.textContent, /Case 01 · Non-SMPL/);
+  assert.equal(caption.textContent, "Motion Case 01");
   assert.equal(viewers[3].model, null, "late SMPL-H loads cannot cross group boundaries");
   groupButtons[0].events.click();
   await settle();
   assert.deepEqual(ids(), expected(1), "group switching returns to case 1");
   assert.ok(columns[3].status.hidden);
+  assert.ok(preparedModes.slice(-5).every((mode) => mode === "texture"), "mode persists across groups");
   assert.equal(progress.max, 14);
 
   context.normalizeModel = () => { throw new Error("preparation failed"); };
   next();
   await settle();
-  assert.deepEqual(ids(), expected(1), "preparation failure also retains the valid case");
-  assert.match(status.textContent, /Unable to load Case 02/);
-});
-
-test("standalone viewers initialize once only near the models section", () => {
-  const roots = [{ id: 1 }, { id: 2 }, { id: 3 }];
-  const section = {};
-  const observers = [];
-  class Observer {
-    constructor(callback, options) { this.callback = callback; this.options = options; observers.push(this); }
-    observe(target) { this.target = target; }
-    disconnect() { this.disconnected = true; }
-  }
-  const context = vm.createContext({
-    window: { IntersectionObserver: Observer },
-    IntersectionObserver: Observer,
-    document: { querySelectorAll: () => roots, querySelector: () => section },
-  });
-  vm.runInContext(readFileSync(join(__dirname, "../script.js"), "utf8"), context);
-  const initialized = [];
-  context.createModelComparisonViewer = (root) => { initialized.push(root); return { update() {} }; };
-  context.initStandaloneViewers();
-  assert.equal(initialized.length, 0, "no viewer construction or GLB loading before intersection");
-  assert.equal(observers[0].target, section);
-  assert.equal(observers[0].options.rootMargin, "300px");
-  observers[0].callback([{ isIntersecting: false }]);
-  assert.equal(initialized.length, 0);
-  observers[0].callback([{ isIntersecting: true }]);
-  assert.deepEqual(initialized, roots);
-  assert.ok(observers[0].disconnected, "disconnect after one initialization");
-  assert.equal(vm.runInContext("activeViewers.length", context), 3);
-
-  context.window.IntersectionObserver = undefined;
-  context.initStandaloneViewers();
-  assert.equal(initialized.length, 6, "older browsers initialize without an observer");
+  assert.deepEqual(ids(), methods.map(() => null), "preparation failure stays empty");
+  assert.match(status.textContent, /Unable to load Motion Case 02/);
 });
 
 test("RAF skips off-screen and hidden-tab viewers and resumes without recreating them", () => {
@@ -293,4 +280,44 @@ test("RAF skips off-screen and hidden-tab viewers and resumes without recreating
   tick();
   assert.equal(updates, 3);
   assert.equal(vm.runInContext("activeViewers.length", context), 1, "no recreation on scrolling");
+});
+
+test("material modes preserve texture references and dispose shared resources once", () => {
+  class Material {
+    constructor(options = {}) { Object.assign(this, options); this.disposals = 0; }
+    dispose() { this.disposals++; }
+  }
+  const context = vm.createContext({
+    window: {}, document: { querySelectorAll: () => [] },
+    THREE: { MeshStandardMaterial: Material, MeshNormalMaterial: Material, DoubleSide: 2 },
+  });
+  vm.runInContext(readFileSync(join(__dirname, "../script.js"), "utf8"), context);
+  const texture = { isTexture: true, disposals: 0, dispose() { this.disposals++; } };
+  const textured = new Material({ map: texture });
+  const plain = new Material();
+  const geometry = { morphAttributes: { position: Array(8).fill({}), normal: Array(8).fill({}) }, disposals: 0, dispose() { this.disposals++; } };
+  const mesh = { isMesh: true, isSkinnedMesh: true, userData: {}, geometry, material: [textured, plain] };
+  const sibling = { ...mesh, userData: {}, material: textured };
+  const model = { traverse(callback) { [mesh, sibling].forEach(callback); } };
+  context.applyModelMaterial(model, "after", "normal");
+  const state = mesh.userData.displayMaterials;
+  assert.equal(state.texture[0], textured, "keep the source texture material");
+  assert.equal(state.texture[1].color, 0x4169E1, "keep existing fallback appearance");
+  assert.ok(state.normal[0].skinning && state.normal[0].morphTargets);
+  assert.equal(state.normal[0].morphNormals, false, "r128 must retain all eight position targets");
+  assert.equal(state.normal[0].flatShading, true);
+  for (let i = 0; i < 5; i++) {
+    context.setModelMaterialMode(model, "texture");
+    assert.equal(mesh.material, state.texture);
+    context.setModelMaterialMode(model, "normal");
+    assert.equal(mesh.material, state.normal);
+  }
+  assert.equal(textured.disposals, 0, "toggles dispose nothing");
+  context.disposeModel(model);
+  assert.equal(textured.disposals, 1);
+  assert.equal(plain.disposals, 1);
+  assert.equal(state.texture[1].disposals, 1);
+  assert.equal(state.normal[0].disposals, 1, "deduplicate normal shared by material groups");
+  assert.equal(texture.disposals, 1);
+  assert.equal(geometry.disposals, 1);
 });
