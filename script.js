@@ -3,14 +3,124 @@ const comparisonCases = {
   "smpl-h": [
     {
       title: "Motion sequence 001849_135",
-      input: "assets/models/001849_135_input.glb",
-      isir: "",
-      meshUtg: "",
-      poseShield: "",
-      ours: "assets/models/001849_135.glb",
+      input: "assets/models/SMPLH-comparison/motionfix_001849_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_001849_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_001849_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_001849_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_001849_135/ours.glb",
     },
-    { title: "Motion sequence · GLBs to be added", input: "", isir: "", meshUtg: "", poseShield: "", ours: "" },
-    { title: "Motion sequence · GLBs to be added", input: "", isir: "", meshUtg: "", poseShield: "", ours: "" },
+    {
+      title: "Motion sequence 001850_135",
+      input: "assets/models/SMPLH-comparison/motionfix_001850_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_001850_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_001850_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_001850_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_001850_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 004429_135",
+      input: "assets/models/SMPLH-comparison/motionfix_004429_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_004429_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_004429_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_004429_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_004429_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 004430_135",
+      input: "assets/models/SMPLH-comparison/motionfix_004430_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_004430_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_004430_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_004430_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_004430_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 004436_135",
+      input: "assets/models/SMPLH-comparison/motionfix_004436_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_004436_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_004436_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_004436_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_004436_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 004448_135",
+      input: "assets/models/SMPLH-comparison/motionfix_004448_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_004448_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_004448_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_004448_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_004448_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 004466_135",
+      input: "assets/models/SMPLH-comparison/motionfix_004466_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_004466_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_004466_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_004466_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_004466_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 004476_135",
+      input: "assets/models/SMPLH-comparison/motionfix_004476_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_004476_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_004476_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_004476_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_004476_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 005315_135",
+      input: "assets/models/SMPLH-comparison/motionfix_005315_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_005315_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_005315_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_005315_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_005315_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 005373_135",
+      input: "assets/models/SMPLH-comparison/motionfix_005373_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_005373_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_005373_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_005373_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_005373_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 005398_135",
+      input: "assets/models/SMPLH-comparison/motionfix_005398_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_005398_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_005398_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_005398_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_005398_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 005403_135",
+      input: "assets/models/SMPLH-comparison/motionfix_005403_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_005403_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_005403_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_005403_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_005403_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 005424_135",
+      input: "assets/models/SMPLH-comparison/motionfix_005424_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_005424_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_005424_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_005424_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_005424_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 005471_135",
+      input: "assets/models/SMPLH-comparison/motionfix_005471_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_005471_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_005471_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_005471_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_005471_135/ours.glb",
+    },
+    {
+      title: "Motion sequence 005642_135",
+      input: "assets/models/SMPLH-comparison/motionfix_005642_135/input.glb",
+      isir: "assets/models/SMPLH-comparison/motionfix_005642_135/isir.glb",
+      meshUtg: "assets/models/SMPLH-comparison/motionfix_005642_135/mesh-utg.glb",
+      poseShield: "assets/models/SMPLH-comparison/motionfix_005642_135/poseshield.glb",
+      ours: "assets/models/SMPLH-comparison/motionfix_005642_135/ours.glb",
+    },
   ],
   "non-smpl": [
     { title: "non-SMPL motion · GLBs to be added", input: "", isir: "", meshUtg: "", ours: "" },
@@ -24,17 +134,48 @@ const activeViewers = [];
 
 if (window.THREE) {
   initComparisonCarousel();
-  viewerRoots.forEach((viewerRoot, index) => {
-    const viewer = createModelComparisonViewer(viewerRoot, index);
-    if (viewer) activeViewers.push(viewer);
-  });
+  initStandaloneViewers();
 
   const tick = () => {
-    activeViewers.forEach((viewer) => viewer.update());
+    if (!document.hidden) {
+      activeViewers.forEach((viewer) => { if (viewer.visible) viewer.update(); });
+    }
     requestAnimationFrame(tick);
   };
 
   requestAnimationFrame(tick);
+}
+
+function observeViewerVisibility(container, viewer) {
+  viewer.visible = !window.IntersectionObserver;
+  if (!window.IntersectionObserver) return;
+  const observer = new IntersectionObserver(([entry]) => {
+    viewer.visible = entry.isIntersecting;
+  });
+  observer.observe(container);
+}
+
+function initStandaloneViewers() {
+  const initialize = () => {
+    viewerRoots.forEach((viewerRoot, index) => {
+      const viewer = createModelComparisonViewer(viewerRoot, index);
+      if (viewer) {
+        observeViewerVisibility(viewerRoot, viewer);
+        activeViewers.push(viewer);
+      }
+    });
+  };
+  const section = document.querySelector("#models");
+  if (window.IntersectionObserver && section) {
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      initialize();
+    }, { rootMargin: "300px" });
+    observer.observe(section);
+  } else {
+    initialize();
+  }
 }
 
 function initComparisonCarousel() {
@@ -44,6 +185,7 @@ function initComparisonCarousel() {
   const progress = carousel.querySelector(".case-progress");
   const caption = carousel.querySelector(".case-caption");
   const count = carousel.querySelector(".case-count");
+  const caseStatus = carousel.querySelector(".case-status");
   const grid = carousel.querySelector(".method-grid");
   const scroll = carousel.querySelector(".method-scroll");
   const groupButtons = document.querySelectorAll("[data-case-group]");
@@ -51,10 +193,18 @@ function initComparisonCarousel() {
   const loader = new THREE.GLTFLoader();
   const columns = Array.from(carousel.querySelectorAll("[data-method]"));
   const viewers = columns.map((column, index) => createModelComparisonViewer(column, index, clock));
-  activeViewers.push(...viewers);
+  const comparison = {
+    update() {
+      const elapsed = clock.getElapsedTime();
+      viewers.forEach((viewer) => viewer.update(elapsed));
+    },
+  };
+  observeViewerVisibility(carousel, comparison);
+  activeViewers.push(comparison);
   let currentIndex = 0;
   let currentGroup = "smpl-h";
   let loadVersion = 0;
+  let displayedCase = null;
   let syncingCamera = false;
 
   viewers.forEach((source) => {
@@ -83,23 +233,8 @@ function initComparisonCarousel() {
     progress.max = cases.length - 1;
     progress.value = currentIndex;
     progress.setAttribute("aria-valuetext", `Case ${currentIndex + 1} of ${cases.length}`);
-    count.textContent = `${number} / ${String(cases.length).padStart(2, "0")}`;
-    caption.textContent = `Case ${number} · ${entry.title}`;
     grid.setAttribute("aria-busy", "true");
-    columns.forEach((column, i) => {
-      viewers[i].setModel(null);
-      const status = column.querySelector(".model-status");
-      status.hidden = false;
-      status.textContent = unavailable[i] ? "Unavailable" : paths[i] ? "Loading GLB…" : "GLB to be added";
-    });
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      // Animate the scroll viewport inside its clip, not the scrollable content.
-      scroll.getAnimations().forEach((animation) => animation.cancel());
-      scroll.animate(
-        [{ opacity: 0, transform: `translateX(${direction * 24}px)` }, { opacity: 1, transform: "translateX(0)" }],
-        { duration: 260, easing: "ease-out" },
-      );
-    }
+    caseStatus.textContent = `Loading ${currentGroup === "smpl-h" ? "SMPL-H" : "non-SMPL"} Case ${number}…`;
 
     const results = await Promise.all(paths.map(async (path) => {
       if (!path) return null;
@@ -115,37 +250,67 @@ function initComparisonCarousel() {
       return;
     }
 
-    const bounds = new THREE.Box3();
-    results.forEach((gltf) => {
-      if (gltf) bounds.union(getSequenceBox(gltf.scene, gltf.animations));
-    });
-    results.forEach((gltf, i) => {
-      const status = columns[i].querySelector(".model-status");
-      if (gltf) {
+    try {
+      if (results.some((gltf, i) => paths[i] && !gltf)) throw new Error("Missing GLB");
+      const input = results[columns.findIndex((column) => column.dataset.method === "input")];
+      const bounds = input ? getSequenceBox(input.scene, input.animations) : new THREE.Box3();
+      const size = bounds.getSize(new THREE.Vector3());
+      // Shared framing margin also accommodates baseline motion outside Input.
+      bounds.expandByScalar(Math.max(size.x, size.y, size.z) * 0.1);
+      results.forEach((gltf, i) => {
+        if (!gltf) return;
         normalizeModel(gltf.scene, bounds);
         applyModelMaterial(gltf.scene, columns[i].dataset.method === "input" ? "before" : "after");
-        viewers[i].setModel(gltf);
-        status.hidden = true;
-      } else if (paths[i]) {
-        status.textContent = "Unable to load GLB";
+      });
+    } catch {
+      results.forEach((gltf) => { if (gltf) disposeModel(gltf.scene); });
+      caseStatus.textContent = `Unable to load Case ${number}. ${displayedCase ? "Previous case retained. " : ""}Select a case to retry.`;
+      if (displayedCase) {
+        currentGroup = displayedCase.group;
+        currentIndex = displayedCase.index;
+        progress.max = comparisonCases[currentGroup].length - 1;
+        progress.value = currentIndex;
+        progress.setAttribute("aria-valuetext", `Case ${currentIndex + 1} of ${comparisonCases[currentGroup].length}`);
       }
+      grid.setAttribute("aria-busy", "false");
+      return;
+    }
+
+    // Prepare every scene before replacing any of the displayed methods.
+    results.forEach((gltf, i) => {
+      viewers[i].setModel(gltf);
+      const status = columns[i].querySelector(".model-status");
+      status.hidden = Boolean(gltf);
+      status.textContent = unavailable[i] ? "Unavailable" : "GLB to be added";
     });
+    displayedCase = { group: currentGroup, index: currentIndex };
+    groupButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.caseGroup === currentGroup)));
+    count.textContent = `${number} / ${String(cases.length).padStart(2, "0")}`;
+    caption.textContent = `Case ${number} · ${entry.title}`;
     clock.start();
     grid.setAttribute("aria-busy", "false");
+    caseStatus.textContent = "";
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // Animate the scroll viewport inside its clip, not the scrollable content.
+      scroll.getAnimations().forEach((animation) => animation.cancel());
+      scroll.animate(
+        [{ opacity: 0.65, transform: `translateX(${direction * 24}px)` }, { opacity: 1, transform: "translateX(0)" }],
+        { duration: 260, easing: "ease-out" },
+      );
+    }
   }
 
   groupButtons.forEach((button) => {
     button.addEventListener("click", () => {
       if (currentGroup === button.dataset.caseGroup) return;
       currentGroup = button.dataset.caseGroup;
-      groupButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
       scroll.scrollLeft = 0;
       showCase(0);
     });
   });
   carousel.querySelector("[data-case-prev]").addEventListener("click", () => showCase(currentIndex - 1, -1));
   carousel.querySelector("[data-case-next]").addEventListener("click", () => showCase(currentIndex + 1, 1));
-  progress.addEventListener("input", () => showCase(Number(progress.value), Number(progress.value) < currentIndex ? -1 : 1));
+  progress.addEventListener("change", () => showCase(Number(progress.value), Number(progress.value) < currentIndex ? -1 : 1));
   showCase(0);
 }
 
@@ -316,8 +481,7 @@ function createModelComparisonViewer(container, index, clock = new THREE.Clock()
         mixers.push(mixer);
       }
     },
-    update() {
-      const elapsed = clock.getElapsedTime();
+    update(elapsed = clock.getElapsedTime()) {
       mixers.forEach((mixer) => {
         const duration = mixer.duration || 0;
         mixer.setTime(duration > 0 ? elapsed % duration : elapsed);

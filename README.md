@@ -52,14 +52,34 @@ often block local model fetches when opening `index.html` directly.
 }
 ```
 
-Empty paths display "GLB to be added". Only the first SMPL-H case currently has
-Input and Ours assets; the remaining cases are placeholders. PoseShield always
+The 15 SMPL-H cases use compressed GLBs under
+`assets/models/SMPLH-comparison/motionfix_<sequence>/`: `input.glb`, `isir.glb`,
+`mesh-utg.glb`, `poseshield.glb`, and `ours.glb`. Keep all five paths explicit in
+`comparisonCases`; export logs are not webpage assets. The JavaScript key stays
+`meshUtg` although its filename is `mesh-utg.glb`.
+
+Empty paths display "GLB to be added". The non-SMPL cases remain placeholders. PoseShield always
 displays "Unavailable" for non-SMPL, and its path is ignored in that group.
 Switching groups returns to the first case in the selected group.
-Arrows wrap through the cases; the progress slider selects a case directly.
-All five views change together, share a camera and animation clock, and use the
-same bounds. Export each method in matching coordinates, units, and timing.
+Arrows wrap through the cases; the progress slider loads a case on committed
+change instead of every drag event. While loading, the previous comparison and
+its caption remain visible. All five views change together only after preparation
+succeeds; failures retain the previous case and display an error.
 
-Run `node --test tests/carousel.test.cjs` to check case navigation and stale-load handling.
+All five views share a camera and animation clock. Animated bounds are computed
+once from Input, with a shared margin of 10% of its largest extent on each side.
+The same center and scale are applied to every method.
+Export each method in matching coordinates, units, and timing. Check framing
+when replacing assets, particularly for motions with large excursions.
+
+The first comparison case loads on page open. Standalone Motion Model Viewers
+initialize once when their section approaches within 300 CSS pixels of the
+viewport. Off-screen viewers and hidden browser tabs skip animation/render
+updates, preserving their scenes for reuse. Browsers without IntersectionObserver
+initialize immediately. No adjacent cases are prefetched or parsed scenes cached.
+
+Run `node --test tests/carousel.test.cjs` to check all 75 asset paths, case
+navigation, atomic loading/failure handling, Input bounds, lazy initialization,
+and visibility-aware rendering.
 
 Keep individual media files below GitHub's 100 MiB hard file limit.

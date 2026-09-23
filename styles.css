@@ -348,6 +348,13 @@ h3 {
   font-size: 14px;
 }
 
+.case-status {
+  min-height: 1.5em;
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .method-viewport {
   overflow: hidden;
 }
