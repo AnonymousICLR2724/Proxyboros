@@ -20,6 +20,9 @@ Then open `http://127.0.0.1:8000/`.
 
 ## Replace Media
 
+Abstract and Method Overview appear before the comparisons. The overview figure
+uses `assets/method overview.png`; preserve its aspect ratio when replacing it.
+
 The Video section and its navigation link are temporarily commented out in
 `index.html`; the original markup and `assets/videos/` are retained.
 
@@ -71,14 +74,20 @@ when replacing assets, particularly for motions with large excursions.
 The first comparison case loads on page open. The **Interactive Animation
 Gallery** derives all 15 Original/Repaired split cards from the same SMPL-H list;
 there is no second asset-path list. Desktop/tablet/mobile show 3/2/1 cards, and
-each arrow moves one card (clamped at the endpoints). After six seconds idle,
-the gallery slowly advances one card and reverses direction at each endpoint.
+each arrow moves one card in a circular sequence. After six seconds idle,
+the gallery slowly advances forward, continuing from Case 15 to Case 01.
+Transitions rotate the existing card nodes without cloned WebGL viewers.
 Pointer dragging pauses advancement; wheel, keyboard, focus and arrow interaction
 restart the idle interval. Reduced-motion preferences disable automatic advances
 and the slide animation.
 
-The gallery loads only its visible cards plus one neighbor on either side when
-on-screen (at most five split viewers on desktop). More distant viewers are
+Each Original/Repaired pair shares one Input-derived animated bound and the same
+10% margin and normalization transform.
+
+The gallery begins preloading within 1000 CSS pixels of the viewport. It loads
+only the visible card window plus one neighbor on either side (at most five
+split viewers on desktop), and renders/auto-advances only when actually visible.
+More distant viewers are
 disposed; revisits use normal browser HTTP caching. Off-screen cards/sections and
 hidden tabs skip rendering, and off-screen/hidden galleries pause auto-advance.
 Original/Repaired labels, split-handle keyboard controls and camera rotation/zoom

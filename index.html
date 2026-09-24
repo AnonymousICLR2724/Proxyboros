@@ -9,11 +9,11 @@
       content="Proxyboros: Motion-Faithful Dynamic Self-Intersection Repair for Rigged Mesh Animations. Anonymous submission 2724 with interactive results and visual comparisons."
     >
     <link rel="icon" type="image/png" href="assets/logo_boros.png">
-    <link rel="stylesheet" href="styles.css?v=20260923-2">
+    <link rel="stylesheet" href="styles.css?v=20260924-1">
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" defer></script>
-    <script src="script.js?v=20260923-2" defer></script>
+    <script src="script.js?v=20260924-1" defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -55,6 +55,24 @@
           <strong>Proxyboros</strong> repairs dynamic self-intersections in rigged mesh
           animations while preserving the original motion.
         </p>
+      </section>
+
+      <section id="abstract" class="section abstract-section">
+        <h2>Abstract</h2>
+        <p class="abstract-copy">
+          Physically plausible animation of rigged shapes is essential for realistic and high-quality 3D content creation. However, motion sequences produced by existing generation models often exhibit surface collisions and self-intersections, resulting in physically implausible geometry and noticeable visual artifacts. Resolving these invalid surface geometries while faithfully preserving the spatiotemporal characteristics of the original motion remains a challenging yet under-explored problem. To address this, we propose <strong>Proxyboros</strong>, an optimization framework for dynamic self-intersection repair that alternates mesh-space repair with rig-space pose adaptation to progressively guide the evolving rig toward temporally coherent skeletal motion. Within each step, <strong>Mesh-Space Proxy Exploration</strong> first extracts intermediate geometric proxies that capture local repair tendencies before independent repairs crystallize into temporally inconsistent static solutions. <strong>Proxy-Guided Pose Adaptation</strong> then incorporates this guidance into a temporally coupled skeletal trajectory using surface-aware proxy guidance, absorbing stable surface-separation cues while relaxing ambiguous local displacements. Experiments on SMPL-H sequences and diverse non-SMPL rigged models demonstrate consistent improvements over state-of-the-art methods in repair quality, pose preservation, and motion fidelity, with robust generalization across heterogeneous mesh and skeleton topologies.
+        </p>
+      </section>
+
+      <section id="method-overview" class="section method-overview-section">
+        <h2>Method Overview</h2>
+        <figure class="method-overview-figure">
+          <img src="assets/method overview.png" width="3039" height="1238" decoding="async"
+            alt="Proxyboros alternates mesh-space proxy exploration and proxy-guided pose adaptation to repair a rigged motion sequence.">
+          <figcaption>
+            Overview of <strong>Proxyboros</strong>. Each iteration first explores self-intersection repair directions and retains the intermediate geometry as a proxy. The proxy then drives pose adaptation under temporal B-spline controls and surface-aware geometric guidance. The resulting rigged sequence initiates the next round, gradually converting local repair directions into consistent skeletal motion.
+          </figcaption>
+        </figure>
       </section>
 
       <section id="comparisons" class="section">
@@ -136,7 +154,7 @@
             <p class="section-kicker">Interactive Animation Gallery</p>
             <h2>Repaired Animations from Proxyboros</h2>
           </div>
-          <p>Explore Original / Repaired splits. Browse one motion at a time, or let the gallery advance when idle.</p>
+          <p>Explore Original / Repaired splits.</p>
         </div>
 
         <div class="film-gallery" role="region" aria-label="Animation gallery">

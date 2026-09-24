@@ -1,0 +1,14 @@
+SMPL-H low-rank pose correction: requested rank=8, effective rank=8, offsets shape=(121, 6890, 3), targets=121 -> 8
+  retained energy=0.99854218, relative Frobenius error=0.038181421
+  vertex error (native mesh units): mean=0.00027798934, P95=0.000666703, max=0.0024549105
+Added 8 low-rank SMPL-H pose corrective shape keys to ours_mesh.
+INFO Draco mesh compression is available, use library at /data5/lbz/Data/blender-5.0.1-linux-x64/5.0/scripts/addons_core/io_scene_gltf2/libextern_draco.so
+02:42:15 | INFO: Starting glTF 2.0 export
+02:42:15 | INFO: Extracting primitive: ours_mesh_data
+02:42:15 | INFO: Primitives created: 1
+02:42:16 | INFO: Finished glTF 2.0 export in 0.9156222343444824 s
+
+Exported /home/bzliu/data/Code/MotionData/glb_results/SMPLH_gallery_compressed_lowrank8/motionfix_005783_135/ours.pending.glb (121 frames, 52 bones, pose correction enabled)
+Blender 5.0.1 (hash a3db93c5b259 built 2025-12-16 01:30:59)
+
+Blender quit

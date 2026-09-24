@@ -27,6 +27,8 @@ test("all 15 SMPL-H cases reference five existing compressed GLBs", () => {
   assert.match(html, /01 \/ 15/);
   assert.match(html, /class="case-caption"[^>]*>Motion Case 01<\/p>/);
   assert.match(html, /class="gallery-track"/);
+  assert.match(html, /<p>Explore Original \/ Repaired splits\.<\/p>/);
+  assert.doesNotMatch(html, /Browse one motion at a time/);
   assert.match(html, /data-display-mode="normal" aria-pressed="true"/);
   const rendered = html.replace(/<!--[\s\S]*?-->/g, "");
   assert.doesNotMatch(rendered, /<section id="videos"|href="#videos"|<video\b/);
@@ -320,4 +322,22 @@ test("material modes preserve texture references and dispose shared resources on
   assert.equal(state.normal[0].disposals, 1, "deduplicate normal shared by material groups");
   assert.equal(texture.disposals, 1);
   assert.equal(geometry.disposals, 1);
+});
+
+test("research overview preserves supplied prose, figure and section order", () => {
+  const html = readFileSync(join(__dirname, "../index.html"), "utf8");
+  const sections = ["abstract", "method-overview", "comparisons", "models", "details"].map((id) => html.indexOf(`<section id="${id}"`));
+  assert.ok(sections.every((offset, i) => offset >= 0 && (i === 0 || offset > sections[i - 1])));
+  const abstract = html.match(/<p class="abstract-copy">([\s\S]*?)<\/p>/)[1];
+  const caption = html.match(/<figcaption>([\s\S]*?)<\/figcaption>/)[1];
+  const text = (markup) => markup.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+  const suppliedAbstract = "Physically plausible animation of rigged shapes is essential for realistic and high-quality 3D content creation. However, motion sequences produced by existing generation models often exhibit surface collisions and self-intersections, resulting in physically implausible geometry and noticeable visual artifacts. Resolving these invalid surface geometries while faithfully preserving the spatiotemporal characteristics of the original motion remains a challenging yet under-explored problem. To address this, we propose Proxyboros, an optimization framework for dynamic self-intersection repair that alternates mesh-space repair with rig-space pose adaptation to progressively guide the evolving rig toward temporally coherent skeletal motion. Within each step, Mesh-Space Proxy Exploration first extracts intermediate geometric proxies that capture local repair tendencies before independent repairs crystallize into temporally inconsistent static solutions. Proxy-Guided Pose Adaptation then incorporates this guidance into a temporally coupled skeletal trajectory using surface-aware proxy guidance, absorbing stable surface-separation cues while relaxing ambiguous local displacements. Experiments on SMPL-H sequences and diverse non-SMPL rigged models demonstrate consistent improvements over state-of-the-art methods in repair quality, pose preservation, and motion fidelity, with robust generalization across heterogeneous mesh and skeleton topologies.";
+  const suppliedCaption = "Overview of Proxyboros. Each iteration first explores self-intersection repair directions and retains the intermediate geometry as a proxy. The proxy then drives pose adaptation under temporal B-spline controls and surface-aware geometric guidance. The resulting rigged sequence initiates the next round, gradually converting local repair directions into consistent skeletal motion.";
+  assert.equal(text(abstract), suppliedAbstract);
+  assert.equal(text(caption), suppliedCaption);
+  assert.match(abstract, /<strong>Mesh-Space Proxy Exploration<\/strong>/);
+  assert.match(abstract, /<strong>Proxy-Guided Pose Adaptation<\/strong>/);
+  assert.doesNotMatch(abstract + caption, /\\textbf|\d{6}_135/);
+  assert.match(html, /src="assets\/method overview.png" width="3039" height="1238"/);
+  assert.ok(existsSync(join(__dirname, "../assets/method overview.png")));
 });

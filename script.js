@@ -162,6 +162,7 @@ function initAnimationGallery() {
     const number = String(index + 1).padStart(2, "0");
     const card = document.createElement("article");
     card.className = "model-card";
+    card.dataset.caseIndex = String(index);
     card.innerHTML = `
       <div class="model-viewer" data-viewer style="--position: 50%;">
         <canvas aria-label="Interactive Original / Repaired Motion Case ${number}"></canvas>
@@ -179,68 +180,100 @@ function initAnimationGallery() {
     track.append(card);
   });
 
-  const cards = Array.from(track.children);
   const previous = frame.querySelector("[data-gallery-prev]");
   const next = frame.querySelector("[data-gallery-next]");
   const count = document.querySelector(".gallery-count");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const pointers = new Set();
   const viewers = new Map();
+  let preloadActive = !window.IntersectionObserver;
+  let visibleCount = 3;
+  let renderedIds = new Set();
+  let isTransitioning = false;
+  let transitionDirection = 0;
+  let transitionTimer;
+  let idleTimer;
   const gallery = {
     visible: !window.IntersectionObserver,
     update() {
-      viewers.forEach((viewer, i) => {
-        if (i >= index && i < index + visibleCount) viewer.update();
-      });
+      if (!gallery.visible || document.hidden) return;
+      viewers.forEach((viewer, id) => { if (renderedIds.has(id)) viewer.update(); });
     },
   };
   activeViewers.push(gallery);
-  let index = 0;
-  let visibleCount = 3;
-  let autoDirection = 1;
-  let idleTimer;
 
   function renderWindow() {
+    const cards = Array.from(track.children);
     visibleCount = Number(getComputedStyle(frame).getPropertyValue("--visible-cards")) || 3;
-    index = Math.min(index, cards.length - visibleCount);
-    const step = cards[0].getBoundingClientRect().width + parseFloat(getComputedStyle(track).gap);
-    track.style.transform = `translateX(${-index * step}px)`;
-    previous.disabled = index === 0;
-    next.disabled = index === cards.length - visibleCount;
-    count.textContent = `${String(index + 1).padStart(2, "0")}–${String(index + visibleCount).padStart(2, "0")} / ${cards.length}`;
+    const caseId = (card) => Number(card.dataset.caseIndex);
+    const label = (card) => String(caseId(card) + 1).padStart(2, "0");
+    count.textContent = `${label(cards[0])}–${label(cards[visibleCount - 1])} / ${cards.length}`;
+    renderedIds = new Set(cards.slice(0, visibleCount + (isTransitioning ? 1 : 0)).map(caseId));
     cards.forEach((card, i) => {
-      card.inert = i < index || i >= index + visibleCount;
+      card.inert = i >= visibleCount;
       card.setAttribute("aria-hidden", String(card.inert));
     });
-    if (!gallery.visible) return;
-    const first = Math.max(0, index - 1);
-    const last = Math.min(cards.length - 1, index + visibleCount);
-    viewers.forEach((viewer, i) => {
-      if (i >= first && i <= last) return;
+    if (!preloadActive) return;
+    // The last node is the previous neighbor, including across 01 <-> 15.
+    const keptCards = [...cards.slice(0, visibleCount + 1), cards[cards.length - 1]];
+    const keptIds = new Set(keptCards.map(caseId));
+    viewers.forEach((viewer, id) => {
+      if (keptIds.has(id)) return;
       viewer.dispose();
-      viewers.delete(i);
+      viewers.delete(id);
     });
-    for (let i = first; i <= last; i += 1) {
-      if (!viewers.has(i)) viewers.set(i, createModelComparisonViewer(cards[i].querySelector("[data-viewer]"), i));
-    }
+    keptCards.forEach((card) => {
+      const id = caseId(card);
+      if (!viewers.has(id)) viewers.set(id, createModelComparisonViewer(card.querySelector("[data-viewer]"), id));
+    });
   }
 
   function restartIdle() {
     clearTimeout(idleTimer);
-    if (!gallery.visible || document.hidden || reducedMotion.matches || pointers.size) return;
-    idleTimer = setTimeout(() => {
-      if (index === cards.length - visibleCount) autoDirection = -1;
-      if (index === 0) autoDirection = 1;
-      move(autoDirection);
-    }, 6000);
+    if (!gallery.visible || document.hidden || reducedMotion.matches || pointers.size || isTransitioning) return;
+    idleTimer = setTimeout(() => move(1), 6000);
   }
 
-  function move(direction) {
-    index = Math.max(0, Math.min(cards.length - visibleCount, index + direction));
+  function finishTransition() {
+    if (!isTransitioning) return;
+    clearTimeout(transitionTimer);
+    if (transitionDirection > 0) track.append(track.firstElementChild);
+    track.style.transition = "none";
+    track.style.transform = "translateX(0px)";
+    // Flush the compensated node rotation before restoring animated transforms.
+    void track.offsetWidth;
+    track.style.transition = "";
+    isTransitioning = false;
     renderWindow();
     restartIdle();
   }
 
+  function move(direction) {
+    if (isTransitioning) return;
+    clearTimeout(idleTimer);
+    isTransitioning = true;
+    transitionDirection = direction;
+    const step = track.firstElementChild.getBoundingClientRect().width + parseFloat(getComputedStyle(track).gap);
+    if (direction < 0) {
+      track.style.transition = "none";
+      track.prepend(track.lastElementChild);
+      track.style.transform = `translateX(${-step}px)`;
+      void track.offsetWidth;
+    }
+    renderWindow();
+    if (reducedMotion.matches || !gallery.visible || document.hidden) {
+      finishTransition();
+      return;
+    }
+    track.style.transition = "";
+    track.style.transform = direction > 0 ? `translateX(${-step}px)` : "translateX(0px)";
+    // Also finish if the browser suppresses transitionend (e.g. during tab changes).
+    transitionTimer = setTimeout(finishTransition, 1100);
+  }
+
+  track.addEventListener("transitionend", (event) => {
+    if (event.target === track && event.propertyName === "transform") finishTransition();
+  });
   previous.addEventListener("click", () => move(-1));
   next.addEventListener("click", () => move(1));
   frame.addEventListener("pointerdown", (event) => { pointers.add(event.pointerId); restartIdle(); });
@@ -252,17 +285,26 @@ function initAnimationGallery() {
   window.addEventListener("pointercancel", release);
   ["wheel", "keydown", "focusin"].forEach((event) => frame.addEventListener(event, restartIdle));
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) pointers.clear();
+    if (document.hidden) { pointers.clear(); finishTransition(); }
     restartIdle();
   });
-  reducedMotion.addEventListener("change", restartIdle);
-  window.addEventListener("resize", () => { renderWindow(); restartIdle(); });
+  reducedMotion.addEventListener("change", () => { finishTransition(); restartIdle(); });
+  window.addEventListener("resize", () => { finishTransition(); renderWindow(); restartIdle(); });
   if (window.IntersectionObserver) {
     new IntersectionObserver(([entry]) => {
       gallery.visible = entry.isIntersecting;
+      if (gallery.visible) preloadActive = true;
+      else finishTransition();
       renderWindow();
       restartIdle();
     }).observe(frame);
+    const preloadObserver = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      preloadActive = true;
+      renderWindow();
+      preloadObserver.disconnect();
+    }, { rootMargin: "1000px 0px" });
+    preloadObserver.observe(frame);
   }
   renderWindow();
   restartIdle();
@@ -472,13 +514,10 @@ function createModelComparisonViewer(container, index, clock = new THREE.Clock()
     const status = container.querySelector(".model-status");
     status.hidden = false;
     status.textContent = "Loading…";
-    Promise.all([
-      loadModel(beforePath, beforeRoot, mixers, clock, "before", () => disposed),
-      loadModel(afterPath, afterRoot, mixers, clock, "after", () => disposed),
-    ]).then((loaded) => {
+    loadSplitModels([beforePath, afterPath], [beforeRoot, afterRoot], mixers, clock, () => disposed).then((loaded) => {
       if (disposed) return;
-      status.hidden = loaded.every(Boolean);
-      status.textContent = loaded.every(Boolean) ? "" : "Unable to load GLB";
+      status.hidden = loaded;
+      status.textContent = loaded ? "" : "Unable to load GLB";
     });
   }
 
@@ -677,28 +716,37 @@ function renderSplitView(renderer, scene, camera, beforeRoot, afterRoot, size, s
   renderer.setScissorTest(false);
 }
 
-async function loadModel(modelPath, root, mixers, clock, variant, isDisposed = () => false) {
-  if (!modelPath || !THREE.GLTFLoader) return false;
-  let gltf;
+async function loadSplitModels(paths, roots, mixers, clock, isDisposed = () => false) {
+  const loader = new THREE.GLTFLoader();
+  const results = await Promise.all(paths.map((path) => loader.loadAsync(path).catch(() => null)));
+  if (isDisposed() || results.some((gltf) => !gltf)) {
+    results.forEach((gltf) => { if (gltf) disposeModel(gltf.scene); });
+    return false;
+  }
+  const pairMixers = [];
   try {
-    gltf = await new THREE.GLTFLoader().loadAsync(modelPath);
-    if (isDisposed()) {
-      disposeModel(gltf.scene);
-      return false;
-    }
-    normalizeModel(gltf.scene, getSequenceBox(gltf.scene, gltf.animations));
-    applyModelMaterial(gltf.scene, variant);
-    root.add(gltf.scene);
-    if (gltf.animations.length) {
-      const mixer = new THREE.AnimationMixer(gltf.scene);
-      mixer.duration = Math.max(...gltf.animations.map((clip) => clip.duration));
-      gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
-      mixer.setTime(mixer.duration > 0 ? clock.getElapsedTime() % mixer.duration : 0);
-      mixers.push(mixer);
-    }
+    const input = results[0];
+    const bounds = getSequenceBox(input.scene, input.animations);
+    const size = bounds.getSize(new THREE.Vector3());
+    bounds.expandByScalar(Math.max(size.x, size.y, size.z) * 0.1);
+    results.forEach((gltf, i) => {
+      normalizeModel(gltf.scene, bounds);
+      applyModelMaterial(gltf.scene, i === 0 ? "before" : "after");
+      if (gltf.animations.length) {
+        const mixer = new THREE.AnimationMixer(gltf.scene);
+        pairMixers.push(mixer);
+        mixer.duration = Math.max(...gltf.animations.map((clip) => clip.duration));
+        gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
+      }
+    });
+    const elapsed = clock.getElapsedTime();
+    pairMixers.forEach((mixer) => mixer.setTime(mixer.duration > 0 ? elapsed % mixer.duration : 0));
+    results.forEach((gltf, i) => roots[i].add(gltf.scene));
+    mixers.push(...pairMixers);
     return true;
   } catch {
-    if (gltf) disposeModel(gltf.scene);
+    pairMixers.forEach((mixer) => { mixer.stopAllAction(); mixer.uncacheRoot(mixer.getRoot()); });
+    results.forEach((gltf) => disposeModel(gltf.scene));
     return false;
   }
 }

@@ -210,6 +210,37 @@ h3 {
   color: var(--ink);
 }
 
+.abstract-section h2,
+.method-overview-section h2 {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.abstract-copy {
+  max-width: 900px;
+  margin: 0 auto;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.method-overview-figure {
+  margin: 0;
+}
+
+.method-overview-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.method-overview-figure figcaption {
+  max-width: 1000px;
+  margin: 18px auto 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
 .section-heading {
   display: flex;
   align-items: end;
