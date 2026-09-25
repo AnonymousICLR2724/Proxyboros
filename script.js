@@ -675,7 +675,7 @@ function createModelComparisonViewer(container, index, clock = new THREE.Clock()
 
   const controls = new THREE.OrbitControls(camera, canvas);
   controls.enableDamping = !singleModel;
-  controls.enablePan = false;
+  controls.enablePan = true;
   controls.autoRotate = false;
   controls.autoRotateSpeed = 0.55;
   controls.target.set(0, 0, 0);
