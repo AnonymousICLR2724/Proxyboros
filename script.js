@@ -855,7 +855,7 @@ function createModelComparisonViewer(container, index, clock = new THREE.Clock()
         const duration = mixer.duration || 0;
         mixer.setTime(duration > 0 ? elapsed % duration : elapsed);
       });
-      controls.target.set(0, 0, 0);
+      // controls.target.set(0, 0, 0);
       controls.update();
       if (singleModel) {
         renderer.clear();
