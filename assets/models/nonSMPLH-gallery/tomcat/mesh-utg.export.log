@@ -1,0 +1,10 @@
+INFO Draco mesh compression is available, use library at /data5/lbz/Data/blender-5.0.1-linux-x64/5.0/scripts/addons_core/io_scene_gltf2/libextern_draco.so
+02:22:11 | INFO: Starting glTF 2.0 export
+02:22:11 | INFO: Extracting primitive: mesh-utg_mesh_data
+02:22:11 | INFO: Primitives created: 1
+02:22:11 | INFO: Finished glTF 2.0 export in 0.33945703506469727 s
+
+Exported /home/bzliu/data/Code/MotionData/glb_results/nonSMPLH/tomcat/mesh-utg.pending.glb (100 frames, 46 bones, pose correction disabled)
+Blender 5.0.1 (hash a3db93c5b259 built 2025-12-16 01:30:59)
+
+Blender quit

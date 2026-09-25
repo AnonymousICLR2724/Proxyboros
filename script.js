@@ -2,14 +2,6 @@
 const comparisonCases = {
   "smpl-h": [
     {
-      title: "Motion sequence 001849_135",
-      input: "assets/models/SMPLH-comparison/motionfix_001849_135/input.glb",
-      isir: "assets/models/SMPLH-comparison/motionfix_001849_135/isir.glb",
-      meshUtg: "assets/models/SMPLH-comparison/motionfix_001849_135/mesh-utg.glb",
-      poseShield: "assets/models/SMPLH-comparison/motionfix_001849_135/poseshield.glb",
-      ours: "assets/models/SMPLH-comparison/motionfix_001849_135/ours.glb",
-    },
-    {
       title: "Motion sequence 001850_135",
       input: "assets/models/SMPLH-comparison/motionfix_001850_135/input.glb",
       isir: "assets/models/SMPLH-comparison/motionfix_001850_135/isir.glb",
@@ -18,36 +10,12 @@ const comparisonCases = {
       ours: "assets/models/SMPLH-comparison/motionfix_001850_135/ours.glb",
     },
     {
-      title: "Motion sequence 004429_135",
-      input: "assets/models/SMPLH-comparison/motionfix_004429_135/input.glb",
-      isir: "assets/models/SMPLH-comparison/motionfix_004429_135/isir.glb",
-      meshUtg: "assets/models/SMPLH-comparison/motionfix_004429_135/mesh-utg.glb",
-      poseShield: "assets/models/SMPLH-comparison/motionfix_004429_135/poseshield.glb",
-      ours: "assets/models/SMPLH-comparison/motionfix_004429_135/ours.glb",
-    },
-    {
       title: "Motion sequence 004430_135",
       input: "assets/models/SMPLH-comparison/motionfix_004430_135/input.glb",
       isir: "assets/models/SMPLH-comparison/motionfix_004430_135/isir.glb",
       meshUtg: "assets/models/SMPLH-comparison/motionfix_004430_135/mesh-utg.glb",
       poseShield: "assets/models/SMPLH-comparison/motionfix_004430_135/poseshield.glb",
       ours: "assets/models/SMPLH-comparison/motionfix_004430_135/ours.glb",
-    },
-    {
-      title: "Motion sequence 004436_135",
-      input: "assets/models/SMPLH-comparison/motionfix_004436_135/input.glb",
-      isir: "assets/models/SMPLH-comparison/motionfix_004436_135/isir.glb",
-      meshUtg: "assets/models/SMPLH-comparison/motionfix_004436_135/mesh-utg.glb",
-      poseShield: "assets/models/SMPLH-comparison/motionfix_004436_135/poseshield.glb",
-      ours: "assets/models/SMPLH-comparison/motionfix_004436_135/ours.glb",
-    },
-    {
-      title: "Motion sequence 004448_135",
-      input: "assets/models/SMPLH-comparison/motionfix_004448_135/input.glb",
-      isir: "assets/models/SMPLH-comparison/motionfix_004448_135/isir.glb",
-      meshUtg: "assets/models/SMPLH-comparison/motionfix_004448_135/mesh-utg.glb",
-      poseShield: "assets/models/SMPLH-comparison/motionfix_004448_135/poseshield.glb",
-      ours: "assets/models/SMPLH-comparison/motionfix_004448_135/ours.glb",
     },
     {
       title: "Motion sequence 004466_135",
@@ -72,14 +40,6 @@ const comparisonCases = {
       meshUtg: "assets/models/SMPLH-comparison/motionfix_005315_135/mesh-utg.glb",
       poseShield: "assets/models/SMPLH-comparison/motionfix_005315_135/poseshield.glb",
       ours: "assets/models/SMPLH-comparison/motionfix_005315_135/ours.glb",
-    },
-    {
-      title: "Motion sequence 005373_135",
-      input: "assets/models/SMPLH-comparison/motionfix_005373_135/input.glb",
-      isir: "assets/models/SMPLH-comparison/motionfix_005373_135/isir.glb",
-      meshUtg: "assets/models/SMPLH-comparison/motionfix_005373_135/mesh-utg.glb",
-      poseShield: "assets/models/SMPLH-comparison/motionfix_005373_135/poseshield.glb",
-      ours: "assets/models/SMPLH-comparison/motionfix_005373_135/ours.glb",
     },
     {
       title: "Motion sequence 005398_135",
@@ -123,9 +83,242 @@ const comparisonCases = {
     },
   ],
   "non-smpl": [
-    { title: "non-SMPL motion · GLBs to be added", input: "", isir: "", meshUtg: "", ours: "" },
-    { title: "non-SMPL motion · GLBs to be added", input: "", isir: "", meshUtg: "", ours: "" },
-    { title: "non-SMPL motion · GLBs to be added", input: "", isir: "", meshUtg: "", ours: "" },
+    {
+      title: "Alligator_AlligatorALL-Bite7_10",
+      input: "assets/models/nonSMPLH-comparison/Alligator_AlligatorALL-Bite7_10/input.glb",
+      isir: "assets/models/nonSMPLH-comparison/Alligator_AlligatorALL-Bite7_10/isir.glb",
+      meshUtg: "assets/models/nonSMPLH-comparison/Alligator_AlligatorALL-Bite7_10/mesh-utg.glb",
+      ours: "assets/models/nonSMPLH-comparison/Alligator_AlligatorALL-Bite7_10/ours.glb",
+    },
+    {
+      title: "brucedog_dance",
+      input: "assets/models/nonSMPLH-comparison/brucedog_dance/input.glb",
+      isir: "assets/models/nonSMPLH-comparison/brucedog_dance/isir.glb",
+      meshUtg: "assets/models/nonSMPLH-comparison/brucedog_dance/mesh-utg.glb",
+      ours: "assets/models/nonSMPLH-comparison/brucedog_dance/ours.glb",
+    },
+    {
+      title: "Centipede_Centipede-Run_211",
+      input: "assets/models/nonSMPLH-comparison/Centipede_Centipede-Run_211/input.glb",
+      isir: "assets/models/nonSMPLH-comparison/Centipede_Centipede-Run_211/isir.glb",
+      meshUtg: "assets/models/nonSMPLH-comparison/Centipede_Centipede-Run_211/mesh-utg.glb",
+      ours: "assets/models/nonSMPLH-comparison/Centipede_Centipede-Run_211/ours.glb",
+    },
+    {
+      title: "Crab_Crab-Defeated_248",
+      input: "assets/models/nonSMPLH-comparison/Crab_Crab-Defeated_248/input.glb",
+      isir: "assets/models/nonSMPLH-comparison/Crab_Crab-Defeated_248/isir.glb",
+      meshUtg: "assets/models/nonSMPLH-comparison/Crab_Crab-Defeated_248/mesh-utg.glb",
+      ours: "assets/models/nonSMPLH-comparison/Crab_Crab-Defeated_248/ours.glb",
+    },
+    {
+      title: "Fox_BboyHipHopMove",
+      input: "assets/models/nonSMPLH-comparison/Fox_BboyHipHopMove/input.glb",
+      isir: "assets/models/nonSMPLH-comparison/Fox_BboyHipHopMove/isir.glb",
+      meshUtg: "assets/models/nonSMPLH-comparison/Fox_BboyHipHopMove/mesh-utg.glb",
+      ours: "assets/models/nonSMPLH-comparison/Fox_BboyHipHopMove/ours.glb",
+    },
+    {
+      title: "Kaya_Angry",
+      input: "assets/models/nonSMPLH-comparison/Kaya_Angry/input.glb",
+      isir: "assets/models/nonSMPLH-comparison/Kaya_Angry/isir.glb",
+      meshUtg: "assets/models/nonSMPLH-comparison/Kaya_Angry/mesh-utg.glb",
+      ours: "assets/models/nonSMPLH-comparison/Kaya_Angry/ours.glb",
+    },
+    {
+      title: "Mickeymouse_Walk",
+      input: "assets/models/nonSMPLH-comparison/Mickeymouse_Walk/input.glb",
+      isir: "assets/models/nonSMPLH-comparison/Mickeymouse_Walk/isir.glb",
+      meshUtg: "assets/models/nonSMPLH-comparison/Mickeymouse_Walk/mesh-utg.glb",
+      ours: "assets/models/nonSMPLH-comparison/Mickeymouse_Walk/ours.glb",
+    },
+    {
+      title: "Spiderman_Crawl",
+      input: "assets/models/nonSMPLH-comparison/Spiderman_Crawl/input.glb",
+      isir: "assets/models/nonSMPLH-comparison/Spiderman_Crawl/isir.glb",
+      meshUtg: "assets/models/nonSMPLH-comparison/Spiderman_Crawl/mesh-utg.glb",
+      ours: "assets/models/nonSMPLH-comparison/Spiderman_Crawl/ours.glb",
+    },
+  ],
+};
+
+// Gallery publishes complete Input/Ours pairs independently of comparison cases.
+const galleryCases = {
+  "smpl-h": [
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_001849_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_001849_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_003675_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_003675_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_004402_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_004402_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_004406_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_004406_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_004422_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_004422_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_004423_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_004423_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_004429_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_004429_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_004436_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_004436_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_004448_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_004448_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_004524_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_004524_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005302_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005302_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005303_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005303_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005304_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005304_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005331_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005331_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005335_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005335_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005348_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005348_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005350_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005350_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005373_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005373_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005376_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005376_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005377_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005377_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005397_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005397_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005399_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005399_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005405_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005405_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005406_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005406_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005535_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005535_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005544_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005544_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005661_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005661_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005783_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005783_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_005998_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_005998_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_006008_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_006008_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_006074_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_006074_135/ours.glb",
+    },
+    {
+      input: "assets/models/SMPLH-gallery/motionfix_006080_135/input.glb",
+      ours: "assets/models/SMPLH-gallery/motionfix_006080_135/ours.glb",
+    },
+  ],
+  "non-smpl": [
+    {
+      input: "assets/models/nonSMPLH-gallery/Anaconda_AnacondaALL-Twistrattle_24/input.glb",
+      ours: "assets/models/nonSMPLH-gallery/Anaconda_AnacondaALL-Twistrattle_24/ours.glb",
+    },
+    {
+      input: "assets/models/nonSMPLH-gallery/Ant_Ant-Shake_47/input.glb",
+      ours: "assets/models/nonSMPLH-gallery/Ant_Ant-Shake_47/ours.glb",
+    },
+    {
+      input: "assets/models/nonSMPLH-gallery/BrownBear_BEAR-WalkLoop_125/input.glb",
+      ours: "assets/models/nonSMPLH-gallery/BrownBear_BEAR-WalkLoop_125/ours.glb",
+    },
+    {
+      input: "assets/models/nonSMPLH-gallery/Centipede_Centipede-Walk_207/input.glb",
+      ours: "assets/models/nonSMPLH-gallery/Centipede_Centipede-Walk_207/ours.glb",
+    },
+    {
+      input: "assets/models/nonSMPLH-gallery/Crab_Crab-Die_247/input.glb",
+      ours: "assets/models/nonSMPLH-gallery/Crab_Crab-Die_247/ours.glb",
+    },
+    {
+      input: "assets/models/nonSMPLH-gallery/Fox_HipHopDancing/input.glb",
+      ours: "assets/models/nonSMPLH-gallery/Fox_HipHopDancing/ours.glb",
+    },
+    {
+      input: "assets/models/nonSMPLH-gallery/Fox_idle_1_382/input.glb",
+      ours: "assets/models/nonSMPLH-gallery/Fox_idle_1_382/ours.glb",
+    },
+    {
+      input: "assets/models/nonSMPLH-gallery/Fox_RumbaDancing/input.glb",
+      ours: "assets/models/nonSMPLH-gallery/Fox_RumbaDancing/ours.glb",
+    },
+    {
+      input: "assets/models/nonSMPLH-gallery/Fox_SwingDancing/input.glb",
+      ours: "assets/models/nonSMPLH-gallery/Fox_SwingDancing/ours.glb",
+    },
+    {
+      input: "assets/models/nonSMPLH-gallery/shootman/input.glb",
+      ours: "assets/models/nonSMPLH-gallery/shootman/ours.glb",
+    },
+    {
+      input: "assets/models/nonSMPLH-gallery/tomcat/input.glb",
+      ours: "assets/models/nonSMPLH-gallery/tomcat/ours.glb",
+    },
   ],
 };
 
@@ -133,7 +326,9 @@ const activeViewers = [];
 
 if (window.THREE) {
   initComparisonCarousel();
-  initAnimationGallery();
+  document.querySelectorAll("[data-gallery-group]").forEach((root) => {
+    initAnimationGallery(root, galleryCases[root.dataset.galleryGroup]);
+  });
 
   const tick = () => {
     if (!document.hidden) {
@@ -154,11 +349,11 @@ function observeViewerVisibility(container, viewer) {
   observer.observe(container);
 }
 
-function initAnimationGallery() {
-  const frame = document.querySelector(".film-gallery");
+function initAnimationGallery(root, cases) {
+  const frame = root.querySelector(".film-gallery");
   if (!frame) return;
   const track = frame.querySelector(".gallery-track");
-  comparisonCases["smpl-h"].forEach((entry, index) => {
+  cases.forEach((entry, index) => {
     const number = String(index + 1).padStart(2, "0");
     const card = document.createElement("article");
     card.className = "model-card";
@@ -182,7 +377,7 @@ function initAnimationGallery() {
 
   const previous = frame.querySelector("[data-gallery-prev]");
   const next = frame.querySelector("[data-gallery-next]");
-  const count = document.querySelector(".gallery-count");
+  const count = root.querySelector(".gallery-count");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const pointers = new Set();
   const viewers = new Map();
@@ -214,7 +409,7 @@ function initAnimationGallery() {
       card.setAttribute("aria-hidden", String(card.inert));
     });
     if (!preloadActive) return;
-    // The last node is the previous neighbor, including across 01 <-> 15.
+    // The last node is the previous neighbor, including across the last/first boundary.
     const keptCards = [...cards.slice(0, visibleCount + 1), cards[cards.length - 1]];
     const keptIds = new Set(keptCards.map(caseId));
     viewers.forEach((viewer, id) => {

@@ -1,0 +1,14 @@
+Blender 5.0.1 (hash a3db93c5b259 built 2025-12-16 01:30:59)
+Traceback (most recent call last):
+  File "/home/bzliu/data/Code/MotionData/export_smplh_obj_sequence_glb.py", line 109, in <module>
+    main()
+  File "/home/bzliu/data/Code/MotionData/export_smplh_obj_sequence_glb.py", line 71, in main
+    roots = data["root_transform"]
+            ~~~~^^^^^^^^^^^^^^^^^^
+  File "/data5/lbz/Data/blender-5.0.1-linux-x64/5.0/python/lib/python3.11/site-packages/numpy/lib/npyio.py", line 263, in __getitem__
+    raise KeyError(f"{key} is not a file in the archive")
+KeyError: 'root_transform is not a file in the archive'
+
+Error: script failed, file: '/home/bzliu/data/Code/MotionData/export_smplh_obj_sequence_glb.py', exiting.
+
+Blender quit

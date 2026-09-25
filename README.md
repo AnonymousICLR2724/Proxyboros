@@ -43,14 +43,15 @@ often block local model fetches when opening `index.html` directly.
 }
 ```
 
-The 15 SMPL-H cases use compressed GLBs under
+The 10 SMPL-H comparison cases use compressed GLBs under
 `assets/models/SMPLH-comparison/motionfix_<sequence>/`: `input.glb`, `isir.glb`,
 `mesh-utg.glb`, `poseshield.glb`, and `ours.glb`. Keep all five paths explicit in
 `comparisonCases`; export logs are not webpage assets. The JavaScript key stays
 `meshUtg` although its filename is `mesh-utg.glb`.
 
-Empty paths display "GLB to be added". The non-SMPL cases remain placeholders. PoseShield always
-displays "Unavailable" for non-SMPL, and its path is ignored in that group.
+The 8 non-SMPL-H comparison cases use `assets/models/nonSMPLH-comparison/`
+with Input, ISIR, Mesh-Utg and Ours files. PoseShield has no result in this group;
+it displays "Unavailable" and no PoseShield file is requested.
 Switching groups returns to the first case in the selected group.
 Arrows wrap through the cases; the progress slider loads a case on committed
 change instead of every drag event. A requested case immediately clears all five
@@ -72,10 +73,21 @@ Export each method in matching coordinates, units, and timing. Check framing
 when replacing assets, particularly for motions with large excursions.
 
 The first comparison case loads on page open. The **Interactive Animation
-Gallery** derives all 15 Original/Repaired split cards from the same SMPL-H list;
-there is no second asset-path list. Desktop/tablet/mobile show 3/2/1 cards, and
+Gallery** contains **SMPL-H Repaired Animations** and **non-SMPL-H Repaired
+Animations**. Both use Original/Repaired split views from independent
+`galleryCases` lists, with only `input.glb` and `ours.glb` paths:
+
+- `assets/models/SMPLH-gallery/`: currently 32 complete pairs.
+- `assets/models/nonSMPLH-gallery/`: currently 11 complete pairs.
+
+Publish only folders containing both required files; unrelated baseline files
+do not affect gallery inclusion. Comparison and Gallery inventories are
+independent explicit lists, with no runtime directory scanning.
+
+Both galleries share the same interactions, with independent navigation, timers,
+visibility and viewer ownership. Desktop/tablet/mobile show 3/2/1 cards, and
 each arrow moves one card in a circular sequence. After six seconds idle,
-the gallery slowly advances forward, continuing from Case 15 to Case 01.
+each visible gallery slowly advances forward, wrapping from its last case to Case 01.
 Transitions rotate the existing card nodes without cloned WebGL viewers.
 Pointer dragging pauses advancement; wheel, keyboard, focus and arrow interaction
 restart the idle interval. Reduced-motion preferences disable automatic advances
@@ -84,7 +96,7 @@ and the slide animation.
 Each Original/Repaired pair shares one Input-derived animated bound and the same
 10% margin and normalization transform.
 
-The gallery begins preloading within 1000 CSS pixels of the viewport. It loads
+Each gallery begins preloading within 1000 CSS pixels of the viewport. It loads
 only the visible card window plus one neighbor on either side (at most five
 split viewers on desktop), and renders/auto-advances only when actually visible.
 More distant viewers are

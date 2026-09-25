@@ -1,13 +1,63 @@
 const assert = require("node:assert/strict");
-const { readFileSync } = require("node:fs");
+const { readFileSync, existsSync, readdirSync } = require("node:fs");
 const { join } = require("node:path");
 const { test } = require("node:test");
 const vm = require("node:vm");
 
-function galleryHarness({ observersEnabled = true, reducedMotion = false } = {}) {
+test("independent gallery datasets publish exactly the complete Input/Ours pairs", () => {
+  const context = vm.createContext({ window: {} });
+  vm.runInContext(readFileSync(join(__dirname, "../script.js"), "utf8"), context);
+  for (const [group, folder] of [["smpl-h", "SMPLH-gallery"], ["non-smpl", "nonSMPLH-gallery"]]) {
+    const cases = vm.runInContext('galleryCases["' + group + '"]', context);
+    assert.notEqual(cases, vm.runInContext('comparisonCases["' + group + '"]', context));
+    const directory = join(__dirname, "../assets/models", folder);
+    const complete = readdirSync(directory, { withFileTypes: true }).filter((item) => item.isDirectory())
+      .map((item) => item.name).filter((id) => ["input", "ours"].every((name) => existsSync(join(directory, id, name + ".glb")))).sort();
+    assert.deepEqual(Array.from(cases, (entry) => entry.input.split("/").at(-2)).sort(), complete);
+    for (const entry of cases) {
+      assert.deepEqual(Object.keys(entry).sort(), ["input", "ours"]);
+      const id = entry.input.split("/").at(-2);
+      for (const name of ["input", "ours"]) {
+        assert.equal(entry[name], `assets/models/${folder}/${id}/${name}.glb`);
+        assert.ok(existsSync(join(__dirname, "..", entry[name])), entry[name]);
+      }
+    }
+    if (group === "non-smpl") assert.equal(cases.length, 11);
+    else {
+      const id = "motionfix_005373_135";
+      assert.equal(cases.some((entry) => entry.input.includes(id)), ["input", "ours"].every((name) => existsSync(join(directory, id, name + ".glb"))), "publish the previously incomplete case only when both required files exist");
+    }
+  }
+});
+
+test("page groups two accessible galleries and preserves the disabled video and Resources content", () => {
+  const html = readFileSync(join(__dirname, "../index.html"), "utf8");
+  const rendered = html.replace(/<!--[\s\S]*?-->/g, "");
+  assert.equal((rendered.match(/Interactive Animation Gallery/g) || []).length, 1);
+  for (const name of ["gallery-block", "film-gallery", "gallery-track", "gallery-count"]) {
+    assert.equal((rendered.match(new RegExp(`class="${name}"`, "g")) || []).length, 2);
+  }
+  for (const [group, label] of [["smpl-h", "SMPL-H"], ["non-smpl", "non-SMPL-H"]]) {
+    assert.ok(rendered.includes(`data-gallery-group="${group}"`));
+    assert.ok(rendered.includes(`<h2>${label} Repaired Animations</h2>`));
+    assert.ok(rendered.includes(`aria-label="${label} animation gallery"`));
+    for (const direction of ["Previous", "Next"]) assert.ok(rendered.includes(`aria-label="${direction} ${label} animation"`));
+  }
+  assert.equal((rendered.match(/data-gallery-prev/g) || []).length, 2);
+  assert.equal((rendered.match(/data-gallery-next/g) || []).length, 2);
+  assert.match(rendered, /href="#details">Resources<\/a>/);
+  assert.match(rendered, /id="details"[\s\S]*?>Resources<\/p>\s*<p>\s*The paper, research code, video, and citation will be available here upon release\.\s*<\/p>/);
+  assert.doesNotMatch(rendered, /Submission Notes|<section id="videos"|href="#videos"|<video\b/);
+  assert.match(html, /<section id="videos"/);
+});
+
+function galleryHarness({ observersEnabled = true, reducedMotion = false, groups = ["smpl-h"] } = {}) {
   const element = () => ({
     events: {}, dataset: {}, style: {}, attributes: {}, children: [],
-    addEventListener(name, handler) { this.events[name] = handler; },
+    addEventListener(name, handler) {
+      const previous = this.events[name];
+      this.events[name] = (...args) => { previous?.(...args); handler(...args); };
+    },
     setAttribute(name, value) { this.attributes[name] = value; },
     append(child) { this.children = this.children.filter((item) => item !== child); this.children.push(child); },
     prepend(child) { this.children = this.children.filter((item) => item !== child); this.children.unshift(child); },
@@ -15,16 +65,22 @@ function galleryHarness({ observersEnabled = true, reducedMotion = false } = {})
     get lastElementChild() { return this.children.at(-1); },
     getBoundingClientRect: () => ({ width: 200 }),
   });
-  const track = element();
-  const previous = element();
-  const next = element();
-  const count = element();
-  const frame = element();
-  frame.querySelector = (selector) => ({ ".gallery-track": track, "[data-gallery-prev]": previous, "[data-gallery-next]": next }[selector]);
+  const galleries = groups.map((group) => {
+    const track = element();
+    const previous = element();
+    const next = element();
+    const count = element();
+    const frame = element();
+    frame.querySelector = (selector) => ({ ".gallery-track": track, "[data-gallery-prev]": previous, "[data-gallery-next]": next }[selector]);
+    const root = { querySelector: (selector) => ({ ".film-gallery": frame, ".gallery-count": count }[selector]) };
+    const finish = () => track.events.transitionend({ target: track, propertyName: "transform" });
+    return { group, root, frame, track, previous, next, count, finish,
+      step(direction = 1) { (direction > 0 ? next : previous).events.click(); finish(); },
+    };
+  });
   const window = { ...element(), matchMedia: () => reduced };
   const reduced = { ...element(), matches: reducedMotion };
   const document = { ...element(), hidden: false,
-    querySelector: (selector) => ({ ".film-gallery": frame, ".gallery-count": count }[selector]),
     createElement() {
       const card = element();
       const viewerRoot = element();
@@ -57,7 +113,13 @@ function galleryHarness({ observersEnabled = true, reducedMotion = false } = {})
     created.push(viewer);
     return viewer;
   };
-  context.initAnimationGallery();
+  for (const gallery of galleries) {
+    const cases = vm.runInContext('galleryCases["' + gallery.group + '"]', context);
+    context.initAnimationGallery(gallery.root, cases);
+    gallery.caseCount = cases.length;
+    gallery.observers = observers.filter((observer) => observer.target === gallery.frame);
+    gallery.alive = () => created.filter((viewer) => !viewer.disposed && gallery.track.children.some((card) => card.querySelector() === viewer.root));
+  }
   const advance = (ms) => {
     const end = now + ms;
     while (true) {
@@ -70,17 +132,15 @@ function galleryHarness({ observersEnabled = true, reducedMotion = false } = {})
     }
     now = end;
   };
-  const finish = () => track.events.transitionend({ target: track, propertyName: "transform" });
-  return { context, frame, track, previous, next, count, window, document, reduced, created, observers, advance, finish,
-    step(direction = 1) { (direction > 0 ? next : previous).events.click(); finish(); },
+  return { ...galleries[0], galleries, context, window, document, reduced, created, observers, advance,
     resize(count) { visibleCards = count; window.events.resize(); },
   };
 }
 
-test("gallery derives 15 labeled split cards from comparison data", () => {
+test("gallery creates labeled split cards from its own dataset", () => {
   const h = galleryHarness();
-  const cases = vm.runInContext('comparisonCases["smpl-h"]', h.context);
-  assert.equal(h.track.children.length, 15);
+  const cases = vm.runInContext('galleryCases["smpl-h"]', h.context);
+  assert.equal(h.track.children.length, h.caseCount);
   h.track.children.forEach((card, index) => {
     const root = card.querySelector("[data-viewer]");
     assert.equal(root.dataset.beforeModel, cases[index].input);
@@ -88,30 +148,30 @@ test("gallery derives 15 labeled split cards from comparison data", () => {
     assert.ok(card.innerHTML.includes(`Motion Case ${String(index + 1).padStart(2, "0")}`));
     assert.doesNotMatch(card.innerHTML, /\d{6}_135/);
   });
-  assert.equal(h.created.length, 0, "DOM shells do not eagerly initialize 15 viewers");
+  assert.equal(h.created.length, 0, "DOM shells do not eagerly initialize all viewers");
 });
 
 test("gallery rotates the original nodes one step, wraps both ways and resizes without skipping cases", () => {
   const h = galleryHarness();
   const nodes = [...h.track.children];
-  assert.equal(h.count.textContent, "01–03 / 15");
+  assert.equal(h.count.textContent, `01–03 / ${h.caseCount}`);
   assert.notEqual(h.previous.disabled, true);
   h.step(-1);
-  assert.equal(h.count.textContent, "15–02 / 15");
-  assert.equal(h.track.firstElementChild, nodes[14]);
+  assert.equal(h.count.textContent, `${h.caseCount}–02 / ${h.caseCount}`);
+  assert.equal(h.track.firstElementChild, nodes[h.caseCount - 1]);
   h.step();
-  assert.equal(h.count.textContent, "01–03 / 15");
+  assert.equal(h.count.textContent, `01–03 / ${h.caseCount}`);
   h.step();
   h.resize(2);
-  assert.equal(h.count.textContent, "02–03 / 15");
+  assert.equal(h.count.textContent, `02–03 / ${h.caseCount}`);
   h.resize(1);
-  assert.equal(h.count.textContent, "02–02 / 15");
-  for (let i = 0; i < 13; i++) h.step();
-  assert.equal(h.count.textContent, "15–15 / 15");
+  assert.equal(h.count.textContent, `02–02 / ${h.caseCount}`);
+  for (let i = 0; i < h.caseCount - 2; i++) h.step();
+  assert.equal(h.count.textContent, `${h.caseCount}–${h.caseCount} / ${h.caseCount}`);
   h.step();
-  assert.equal(h.count.textContent, "01–01 / 15");
+  assert.equal(h.count.textContent, `01–01 / ${h.caseCount}`);
   assert.notEqual(h.next.disabled, true);
-  assert.deepEqual(h.track.children, nodes, "a full cycle reuses the same 15 nodes in original order");
+  assert.deepEqual(h.track.children, nodes, "a full cycle reuses the same nodes in original order");
   assert.equal(h.track.style.transform, "translateX(0px)");
 });
 
@@ -124,36 +184,36 @@ test("transition guard prevents duplicate rotations and both directions settle c
   h.previous.events.click();
   h.finish();
   h.finish();
-  assert.equal(h.count.textContent, "02–04 / 15");
-  assert.equal(h.track.children.length, 15);
+  assert.equal(h.count.textContent, `02–04 / ${h.caseCount}`);
+  assert.equal(h.track.children.length, h.caseCount);
   h.previous.events.click();
   assert.equal(h.track.firstElementChild.dataset.caseIndex, "0");
   h.finish();
-  assert.equal(h.count.textContent, "01–03 / 15");
+  assert.equal(h.count.textContent, `01–03 / ${h.caseCount}`);
   h.next.events.click();
   h.advance(1100);
-  assert.equal(h.count.textContent, "02–04 / 15", "fallback handles a missing transitionend");
+  assert.equal(h.count.textContent, `02–04 / ${h.caseCount}`, "fallback handles a missing transitionend");
 });
 
 test("gallery advances after six idle seconds, resets on interaction and pauses while dragging", () => {
   const h = galleryHarness();
   h.observers[0].callback([{ isIntersecting: true }]);
   h.advance(5999);
-  assert.equal(h.count.textContent, "01–03 / 15");
+  assert.equal(h.count.textContent, `01–03 / ${h.caseCount}`);
   h.advance(1);
   h.finish();
-  assert.equal(h.count.textContent, "02–04 / 15");
+  assert.equal(h.count.textContent, `02–04 / ${h.caseCount}`);
   h.advance(5000);
   h.frame.events.wheel();
   h.advance(5999);
-  assert.equal(h.count.textContent, "02–04 / 15");
+  assert.equal(h.count.textContent, `02–04 / ${h.caseCount}`);
   h.frame.events.pointerdown({ pointerId: 7 });
   h.advance(20000);
-  assert.equal(h.count.textContent, "02–04 / 15");
+  assert.equal(h.count.textContent, `02–04 / ${h.caseCount}`);
   h.window.events.pointerup({ pointerId: 7 });
   h.advance(6000);
   h.finish();
-  assert.equal(h.count.textContent, "03–05 / 15");
+  assert.equal(h.count.textContent, `03–05 / ${h.caseCount}`);
 });
 
 test("autoplay always advances forward through repeated desktop, tablet and mobile wraps", () => {
@@ -162,11 +222,11 @@ test("autoplay always advances forward through repeated desktop, tablet and mobi
     h.resize(visible);
     h.observers[0].callback([{ isIntersecting: true }]);
     const nodes = new Set(h.track.children);
-    for (let step = 1; step <= 32; step++) {
+    for (let step = 1; step <= h.caseCount * 2 + 2; step++) {
       h.advance(6000);
       h.finish();
-      assert.equal(Number(h.track.firstElementChild.dataset.caseIndex), step % 15);
-      assert.equal(h.track.children.length, 15);
+      assert.equal(Number(h.track.firstElementChild.dataset.caseIndex), step % h.caseCount);
+      assert.equal(h.track.children.length, h.caseCount);
       assert.ok(h.track.children.every((card) => nodes.has(card)));
       assert.ok(h.created.filter((viewer) => !viewer.disposed).length <= visible + 2);
     }
@@ -176,36 +236,36 @@ test("autoplay always advances forward through repeated desktop, tablet and mobi
 test("offscreen, hidden and reduced-motion states pause automatic but preserve circular manual navigation", () => {
   const h = galleryHarness();
   h.advance(20000);
-  assert.equal(h.count.textContent, "01–03 / 15");
+  assert.equal(h.count.textContent, `01–03 / ${h.caseCount}`);
   h.observers[0].callback([{ isIntersecting: true }]);
   h.document.hidden = true;
   h.document.events.visibilitychange();
   h.advance(20000);
-  assert.equal(h.count.textContent, "01–03 / 15");
+  assert.equal(h.count.textContent, `01–03 / ${h.caseCount}`);
   h.document.hidden = false;
   h.document.events.visibilitychange();
   h.reduced.matches = true;
   h.reduced.events.change();
   h.advance(20000);
   h.previous.events.click();
-  assert.equal(h.count.textContent, "15–02 / 15");
+  assert.equal(h.count.textContent, `${h.caseCount}–02 / ${h.caseCount}`);
   assert.equal(h.track.style.transform, "translateX(0px)", "reduced-motion manual steps finish without animation");
   h.next.events.click();
-  assert.equal(h.count.textContent, "01–03 / 15");
+  assert.equal(h.count.textContent, `01–03 / ${h.caseCount}`);
   h.reduced.matches = false;
   h.reduced.events.change();
   h.advance(6000);
   h.finish();
-  assert.equal(h.count.textContent, "02–04 / 15");
+  assert.equal(h.count.textContent, `02–04 / ${h.caseCount}`);
   h.observers[0].callback([{ isIntersecting: false }]);
   h.advance(20000);
-  assert.equal(h.count.textContent, "02–04 / 15");
+  assert.equal(h.count.textContent, `02–04 / ${h.caseCount}`);
 });
 
 test("bounded viewer ownership follows stable case identity across wraparound", () => {
   const h = galleryHarness();
   h.observers[0].callback([{ isIntersecting: true }]);
-  assert.deepEqual(h.created.map((viewer) => viewer.index), [0, 1, 2, 3, 14]);
+  assert.deepEqual(h.created.map((viewer) => viewer.index), [0, 1, 2, 3, h.caseCount - 1]);
   const original = h.created[0];
   const preceding = h.created[4];
   vm.runInContext("activeViewers[0].update()", h.context);
@@ -214,7 +274,7 @@ test("bounded viewer ownership follows stable case identity across wraparound", 
   assert.equal(preceding.disposed, false, "previous neighbor remains initialized when it becomes visible");
   h.step();
   assert.equal(original.disposed, false);
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < h.caseCount * 2; i++) {
     h.step();
     const alive = h.created.filter((viewer) => !viewer.disposed);
     assert.ok(alive.length <= 5);
@@ -231,6 +291,69 @@ test("bounded viewer ownership follows stable case identity across wraparound", 
   h.observers[0].callback([{ isIntersecting: false }]);
   vm.runInContext("activeViewers[0].update()", h.context);
   assert.deepEqual(h.created.map((viewer) => viewer.updates), updates);
+});
+
+test("dual galleries isolate cards, preload, timers, visibility and viewer disposal", () => {
+  const h = galleryHarness({ groups: ["smpl-h", "non-smpl"] });
+  const [a, b] = h.galleries;
+  for (const gallery of h.galleries) {
+    const cases = vm.runInContext(`galleryCases["${gallery.group}"]`, h.context);
+    assert.equal(gallery.track.children.length, cases.length);
+    gallery.track.children.forEach((card, index) => {
+      assert.equal(card.querySelector().dataset.beforeModel, cases[index].input);
+      assert.equal(card.querySelector().dataset.afterModel, cases[index].ours);
+      assert.ok(card.innerHTML.includes(`Motion Case ${String(index + 1).padStart(2, "0")}`));
+      assert.doesNotMatch(card.innerHTML, /motionfix_|Anaconda|tomcat/);
+    });
+    assert.equal(gallery.observers[1].options.rootMargin, "1000px 0px");
+  }
+  a.observers[1].callback([{ isIntersecting: true }]);
+  assert.equal(a.alive().length, 5);
+  assert.equal(b.alive().length, 0, "one preload does not initialize the other gallery");
+  b.observers[1].callback([{ isIntersecting: true }]);
+  assert.equal(b.alive().length, 5);
+  for (const gallery of h.galleries) gallery.observers[0].callback([{ isIntersecting: true }]);
+  h.advance(5000);
+  a.frame.events.wheel();
+  h.advance(1000);
+  b.finish();
+  assert.equal(a.track.firstElementChild.dataset.caseIndex, "0");
+  assert.equal(b.track.firstElementChild.dataset.caseIndex, "1", "interaction in A does not reset B's idle timer");
+  h.advance(5000);
+  a.finish();
+  assert.equal(a.track.firstElementChild.dataset.caseIndex, "1");
+  assert.equal(b.track.firstElementChild.dataset.caseIndex, "1");
+  a.observers[0].callback([{ isIntersecting: false }]);
+  const aNodes = [...a.track.children];
+  const aViewers = a.alive();
+  const updates = aViewers.map((viewer) => viewer.updates);
+  vm.runInContext("activeViewers.forEach((viewer) => viewer.update())", h.context);
+  assert.deepEqual(aViewers.map((viewer) => viewer.updates), updates);
+  assert.ok(b.alive().some((viewer) => viewer.updates > 0));
+  h.advance(1000);
+  b.finish();
+  assert.deepEqual(a.track.children, aNodes);
+  for (let i = 0; i < b.caseCount * 2; i++) {
+    b.step();
+    assert.ok(b.alive().length <= 5);
+    assert.deepEqual(a.alive(), aViewers, "B cannot dispose A's viewers with matching numeric IDs");
+  }
+  const bNodes = [...b.track.children];
+  for (let i = 0; i < a.caseCount * 2; i++) {
+    a.step(-1);
+    assert.ok(a.alive().length <= 5);
+    assert.deepEqual(b.track.children, bNodes);
+  }
+  h.reduced.matches = true;
+  h.reduced.events.change();
+  a.observers[0].callback([{ isIntersecting: true }]);
+  const firstIds = h.galleries.map((gallery) => gallery.track.firstElementChild.dataset.caseIndex);
+  h.advance(20000);
+  assert.deepEqual(h.galleries.map((gallery) => gallery.track.firstElementChild.dataset.caseIndex), firstIds);
+  for (const gallery of h.galleries) {
+    gallery.step();
+    assert.equal(Number(gallery.track.firstElementChild.dataset.caseIndex), (Number(firstIds[h.galleries.indexOf(gallery)]) + 1) % gallery.caseCount);
+  }
 });
 
 function splitHarness() {
@@ -313,20 +436,20 @@ test("preloading creates a bounded window without rendering or auto-advancing of
   vm.runInContext("activeViewers[0].update()", h.context);
   assert.ok(h.created.every((viewer) => viewer.updates === 0));
   h.advance(20000);
-  assert.equal(h.count.textContent, "01–03 / 15");
+  assert.equal(h.count.textContent, `01–03 / ${h.caseCount}`);
   h.observers[0].callback([{ isIntersecting: true }]);
   assert.equal(h.created.length, 5, "true visibility reuses preloaded viewers");
   vm.runInContext("activeViewers[0].update()", h.context);
   assert.deepEqual(h.created.map((viewer) => viewer.updates), [1, 1, 1, 0, 0]);
   h.advance(6000);
   h.finish();
-  assert.equal(h.count.textContent, "02–04 / 15");
+  assert.equal(h.count.textContent, `02–04 / ${h.caseCount}`);
 });
 
 test("browsers without observers initialize one bounded cyclic window immediately", () => {
   const h = galleryHarness({ observersEnabled: false, reducedMotion: true });
   assert.equal(h.created.length, 5);
   h.previous.events.click();
-  assert.equal(h.count.textContent, "15–02 / 15");
+  assert.equal(h.count.textContent, `${h.caseCount}–02 / ${h.caseCount}`);
   assert.equal(h.created.filter((viewer) => !viewer.disposed).length, 5);
 });

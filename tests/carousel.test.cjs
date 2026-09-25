@@ -1,30 +1,34 @@
 const assert = require("node:assert/strict");
-const { readFileSync, existsSync } = require("node:fs");
+const { readFileSync, existsSync, readdirSync } = require("node:fs");
 const { join } = require("node:path");
 const { test } = require("node:test");
 const vm = require("node:vm");
 
-test("all 15 SMPL-H cases reference five existing compressed GLBs", () => {
+test("comparison inventories reference every complete case and initial HTML matches", () => {
   const context = vm.createContext({ window: {}, document: { querySelectorAll: () => [] } });
   const source = readFileSync(join(__dirname, "../script.js"), "utf8");
   vm.runInContext(source, context);
   const cases = vm.runInContext('comparisonCases["smpl-h"]', context);
-  assert.equal(cases.length, 15);
-  assert.equal(new Set(cases.map((entry) => entry.input)).size, 15);
-  const filenames = { input: "input", isir: "isir", meshUtg: "mesh-utg", poseShield: "poseshield", ours: "ours" };
-  cases.forEach((entry) => {
-    const sequence = entry.title.match(/\d{6}_135/)[0];
-    Object.entries(filenames).forEach(([method, filename]) => {
-      assert.equal(entry[method], `assets/models/SMPLH-comparison/motionfix_${sequence}/${filename}.glb`);
-      assert.ok(existsSync(join(__dirname, "..", entry[method])), entry[method]);
-    });
-  });
-  const nonSmpl = vm.runInContext('comparisonCases["non-smpl"]', context);
-  assert.equal(nonSmpl.length, 3);
-  assert.ok(nonSmpl.every((entry) => !entry.poseShield));
+  for (const [group, folder, expectedCount] of [["smpl-h", "SMPLH-comparison", 10], ["non-smpl", "nonSMPLH-comparison", 8]]) {
+    const entries = vm.runInContext('comparisonCases["' + group + '"]', context);
+    const directory = join(__dirname, "../assets/models", folder);
+    const inventory = readdirSync(directory, { withFileTypes: true }).filter((item) => item.isDirectory()).map((item) => item.name).sort();
+    assert.equal(entries.length, expectedCount);
+    assert.deepEqual(Array.from(entries, (entry) => entry.input.split("/").at(-2)).sort(), inventory);
+    const filenames = { input: "input", isir: "isir", meshUtg: "mesh-utg", ours: "ours" };
+    if (group === "smpl-h") filenames.poseShield = "poseshield";
+    for (const entry of entries) {
+      const id = entry.input.split("/").at(-2);
+      for (const [method, filename] of Object.entries(filenames)) {
+        assert.equal(entry[method], `assets/models/${folder}/${id}/${filename}.glb`);
+        assert.ok(existsSync(join(__dirname, "..", entry[method])), entry[method]);
+      }
+      if (group === "non-smpl") assert.equal(entry.poseShield, undefined);
+    }
+  }
   const html = readFileSync(join(__dirname, "../index.html"), "utf8");
-  assert.match(html, /class="case-progress"[^>]*max="14"/);
-  assert.match(html, /01 \/ 15/);
+  assert.equal(Number(html.match(/class="case-progress"[^>]*max="(\d+)"/)[1]), cases.length - 1);
+  assert.ok(html.includes(`01 / ${cases.length}`));
   assert.match(html, /class="case-caption"[^>]*>Motion Case 01<\/p>/);
   assert.match(html, /class="gallery-track"/);
   assert.match(html, /<p>Explore Original \/ Repaired splits\.<\/p>/);
@@ -101,7 +105,8 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   context.applyModelMaterial = (_, variant, mode) => preparedModes.push(mode);
   context.disposeModel = (scene) => disposed.push(scene.id);
   const populated = (prefix) => Object.fromEntries(methods.map((method) => [method, `${prefix}-${method}`]));
-  context.cases = Array.from({ length: 15 }, (_, i) => ({ title: `Motion ${i + 1}`, ...populated(`case-${i + 1}`) }));
+  const caseCount = vm.runInContext('comparisonCases["smpl-h"].length', context);
+  context.cases = Array.from({ length: caseCount }, (_, i) => ({ title: `Motion ${i + 1}`, ...populated(`case-${i + 1}`) }));
   context.nonSmplCases = [
     { title: "Non-SMPL motion", ...populated("non-smpl") },
     { title: "Another non-SMPL motion" },
@@ -130,7 +135,7 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   await flush();
   assert.deepEqual(ids(), expected(1));
   assert.ok(columns.every((column) => column.status.hidden));
-  assert.equal(count.textContent, "01 / 15");
+  assert.equal(count.textContent, `01 / ${caseCount}`);
   assert.deepEqual(bounded, ["case-1-input"], "compute only Input bounds once");
   assert.equal(normalized.length, 5);
   assert.equal(normalized[0].bounds.margin, 0.2, "shared margin is 10% of Input extent on each side");
@@ -146,7 +151,7 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   next();
   assert.deepEqual(ids(), methods.map(() => null), "old geometry clears immediately");
   assert.equal(caption.textContent, "Motion Case 02", "caption immediately identifies requested case");
-  assert.equal(count.textContent, "02 / 15");
+  assert.equal(count.textContent, `02 / ${caseCount}`);
   assert.match(status.textContent, /Loading Motion Case 02/);
   requests.slice(-5, -1).forEach(resolve);
   await flush();
@@ -155,7 +160,7 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   await flush();
   assert.deepEqual(ids(), expected(2));
   assert.ok(preparedModes.slice(-5).every((mode) => mode === "texture"), "chosen mode persists across cases");
-  assert.equal(count.textContent, "02 / 15");
+  assert.equal(count.textContent, `02 / ${caseCount}`);
   assert.equal(caption.textContent, "Motion Case 02");
   assert.doesNotMatch(caption.textContent + status.textContent, /\d{6}_135/);
   assert.deepEqual(bounded, ["case-1-input", "case-2-input"], "one Input computation for each loaded case");
@@ -172,7 +177,7 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   assert.equal(disposed.length, 5, "stale scenes are disposed");
 
   const beforeDrag = requests.length;
-  for (let value = 0; value < 15; value += 1) {
+  for (let value = 0; value < caseCount; value += 1) {
     progress.value = value;
     progress.events.input?.();
   }
@@ -180,13 +185,13 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   progress.events.change();
   assert.equal(requests.length, beforeDrag + 5, "commit requests one batch");
   await settle();
-  assert.deepEqual(ids(), expected(15));
+  assert.deepEqual(ids(), expected(caseCount));
   next();
   await settle();
-  assert.deepEqual(ids(), expected(1), "next wraps through all 15 cases");
+  assert.deepEqual(ids(), expected(1), "next wraps through all cases");
   prev();
   await settle();
-  assert.deepEqual(ids(), expected(15), "previous wraps to case 15");
+  assert.deepEqual(ids(), expected(caseCount), "previous wraps to the last case");
 
   next();
   const failed = requests.slice(-5);
@@ -198,7 +203,7 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   assert.match(status.textContent, /Unable to load Motion Case 01/);
   assert.equal(disposed.length, 9, "dispose successful members of failed batch");
   assert.equal(Number(progress.value), 0, "keep requested selection after failure");
-  assert.equal(progress.attributes["aria-valuetext"], "Case 1 of 15");
+  assert.equal(progress.attributes["aria-valuetext"], `Case 1 of ${caseCount}`);
   assert.equal(controls[".method-grid"].attributes["aria-busy"], "false");
   progress.events.change();
   await settle();
@@ -236,7 +241,7 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
   assert.deepEqual(ids(), expected(1), "group switching returns to case 1");
   assert.ok(columns[3].status.hidden);
   assert.ok(preparedModes.slice(-5).every((mode) => mode === "texture"), "mode persists across groups");
-  assert.equal(progress.max, 14);
+  assert.equal(progress.max, caseCount - 1);
 
   context.normalizeModel = () => { throw new Error("preparation failed"); };
   next();

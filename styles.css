@@ -274,6 +274,10 @@ h3 {
   overflow: hidden;
 }
 
+.gallery-block + .gallery-block {
+  margin-top: 48px;
+}
+
 .film-gallery {
   --visible-cards: 3;
   position: relative;

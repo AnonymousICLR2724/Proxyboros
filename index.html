@@ -25,7 +25,7 @@
         <a href="#comparisons">Comparisons</a>
         <a href="#models">3D Models</a>
         <!-- <a href="#videos">Videos</a> -->
-        <a href="#details">Details</a>
+        <a href="#details">Resources</a>
       </nav>
     </header>
 
@@ -90,8 +90,8 @@
         <div id="comparison-panel" class="case-carousel" aria-label="Five-method mesh comparison">
           <div class="case-controls">
             <button type="button" class="case-arrow" data-case-prev aria-label="Previous comparison case">&#8592;</button>
-            <input class="case-progress" type="range" min="0" max="14" value="0" step="1" aria-label="Comparison case">
-            <span class="case-count">01 / 15</span>
+            <input class="case-progress" type="range" min="0" max="9" value="0" step="1" aria-label="Comparison case">
+            <span class="case-count">01 / 10</span>
             <button type="button" class="case-arrow" data-case-next aria-label="Next comparison case">&#8594;</button>
           </div>
           <div class="case-info-row">
@@ -149,22 +149,37 @@
       </section>
 
       <section id="models" class="section">
-        <div class="section-heading">
-          <div>
-            <p class="section-kicker">Interactive Animation Gallery</p>
-            <h2>Repaired Animations from Proxyboros</h2>
+        <p class="section-kicker">Interactive Animation Gallery</p>
+
+        <div class="gallery-block" data-gallery-group="smpl-h">
+          <div class="section-heading">
+            <h2>SMPL-H Repaired Animations</h2>
+            <p>Explore Original / Repaired splits.</p>
           </div>
-          <p>Explore Original / Repaired splits.</p>
+          <div class="film-gallery" role="region" aria-label="SMPL-H animation gallery">
+            <button type="button" class="gallery-arrow" data-gallery-prev aria-label="Previous SMPL-H animation">&#8592;</button>
+            <div class="gallery-viewport">
+              <div class="gallery-track"></div>
+            </div>
+            <button type="button" class="gallery-arrow" data-gallery-next aria-label="Next SMPL-H animation">&#8594;</button>
+          </div>
+          <p class="gallery-count"></p>
         </div>
 
-        <div class="film-gallery" role="region" aria-label="Animation gallery">
-          <button type="button" class="gallery-arrow" data-gallery-prev aria-label="Previous animation">&#8592;</button>
-          <div class="gallery-viewport">
-            <div class="gallery-track"></div>
+        <div class="gallery-block" data-gallery-group="non-smpl">
+          <div class="section-heading">
+            <h2>non-SMPL-H Repaired Animations</h2>
+            <p>Explore Original / Repaired splits.</p>
           </div>
-          <button type="button" class="gallery-arrow" data-gallery-next aria-label="Next animation">&#8594;</button>
+          <div class="film-gallery" role="region" aria-label="non-SMPL-H animation gallery">
+            <button type="button" class="gallery-arrow" data-gallery-prev aria-label="Previous non-SMPL-H animation">&#8592;</button>
+            <div class="gallery-viewport">
+              <div class="gallery-track"></div>
+            </div>
+            <button type="button" class="gallery-arrow" data-gallery-next aria-label="Next non-SMPL-H animation">&#8594;</button>
+          </div>
+          <p class="gallery-count"></p>
         </div>
-        <p class="gallery-count"></p>
       </section>
 
       <!-- Video results temporarily disabled.
@@ -212,11 +227,9 @@
       -->
 
       <section id="details" class="section details-section">
-        <p class="section-kicker">Submission Notes</p>
+        <p class="section-kicker">Resources</p>
         <p>
-          Keep this page anonymous: use neutral filenames, remove author and
-          institution names from assets, and avoid external links that identify
-          the authors before the review period ends.
+          The paper, research code, video, and citation will be available here upon release.
         </p>
       </section>
     </main>
