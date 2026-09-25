@@ -63,11 +63,13 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
     querySelector() { return this.status; },
   }));
   const frames = [];
+  const vector = () => ({ x: 0, y: 0, z: 0, copy(other) { Object.assign(this, other); } });
   const viewers = columns.map(() => ({
     model: null,
     setMode(mode) { this.mode = mode; },
     update(elapsed) { frames.push(elapsed); },
-    controls: element(),
+    camera: { position: vector(), quaternion: vector() },
+    controls: { ...element(), target: vector(), update() { this.events.change(); } },
     setModel(model) { this.model = model; },
   }));
   const requests = [];
@@ -112,6 +114,18 @@ test("five-method cases switch atomically, wrap, and ignore stale loads", async 
     { title: "Another non-SMPL motion" },
   ];
   vm.runInContext('comparisonCases["smpl-h"] = cases; comparisonCases["non-smpl"] = nonSmplCases; initComparisonCarousel();', context);
+  const sourceViewer = viewers[2];
+  Object.assign(sourceViewer.camera.position, { x: 1, y: 2, z: 4 });
+  Object.assign(sourceViewer.camera.quaternion, { x: 0.1, y: 0.2, z: 0.3, w: 0.9 });
+  Object.assign(sourceViewer.controls.target, { x: 1, y: 2, z: 0 });
+  sourceViewer.controls.events.change();
+  for (const viewer of viewers) {
+    for (const axis of ["x", "y", "z"]) {
+      assert.equal(viewer.camera.position[axis], sourceViewer.camera.position[axis]);
+      assert.equal(viewer.controls.target[axis], sourceViewer.controls.target[axis]);
+    }
+    for (const axis of ["x", "y", "z", "w"]) assert.equal(viewer.camera.quaternion[axis], sourceViewer.camera.quaternion[axis]);
+  }
   const flush = () => new Promise(setImmediate);
   const resolve = (request) => request.resolve({ scene: { id: request.path }, animations: [] });
   const next = controls["[data-case-next]"].events.click;

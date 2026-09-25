@@ -676,8 +676,13 @@ function createModelComparisonViewer(container, index, clock = new THREE.Clock()
   const controls = new THREE.OrbitControls(camera, canvas);
   controls.enableDamping = !singleModel;
   controls.enablePan = true;
+  controls.screenSpacePanning = true;
+  controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+  controls.mouseButtons.MIDDLE = THREE.MOUSE.DOLLY;
+  controls.mouseButtons.RIGHT = THREE.MOUSE.PAN;
   controls.autoRotate = false;
   controls.autoRotateSpeed = 0.55;
+  // Default pan is zero; any initial offset must move camera.position and controls.target equally.
   controls.target.set(0, 0, 0);
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.24));
@@ -855,7 +860,6 @@ function createModelComparisonViewer(container, index, clock = new THREE.Clock()
         const duration = mixer.duration || 0;
         mixer.setTime(duration > 0 ? elapsed % duration : elapsed);
       });
-      // controls.target.set(0, 0, 0);
       controls.update();
       if (singleModel) {
         renderer.clear();
